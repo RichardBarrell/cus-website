@@ -1,0 +1,172 @@
+<!doctype html>
+<html><head><meta charset="utf-8" />
+<title>Richard Barrell's curriculum vitae</title>
+<link rel="stylesheet" href="normalize-5.0.css" />
+<link rel="stylesheet" href="main.css" />
+</head><body><div id="content">
+
+
+<h1>Richard Barrell's curriculum vitae</h1>
+<nav class="top-nav">
+  <a href="/">Home</a>
+  <a href="/cv.html">C.V.</a>
+  <a href="/blog_list.html">Blog posts</a>
+  <a href="mailto:richard@brrll.co.uk">Contact</a>
+</nav>
+
+
+<style type="text/css">
+ table.brief {
+  border-collapse: separate;
+  border-spacing: 0.1em 0.3em;
+ }
+ #contact table.brief {
+  border-spacing: 0.1em 0.1em;
+ }
+ table.brief td {
+  vertical-align: top;
+  width: auto;
+ }
+ table.brief td:nth-child(1) {
+  width: 8em;
+ }
+ section {
+  margin: 0 0 2em 0;
+ }
+ @media print {
+  nav {
+   display: none;
+  }
+ }
+</style>
+
+<section id="contact">
+  <h2>Contact:</h2>
+  <table class="brief">
+    <tbody>
+    <tr><td>Email:</td><td><a href="mailto:richard@brrll.co.uk">richard@brrll.co.uk</a></td></tr>
+    <tr><td>LinkedIn:</td><td><a href="https://www.linkedin.com/in/richardbarrell">https://www.linkedin.com/in/richardbarrell</a></td></tr>
+    <tr><td>Github:</td><td><a href="https://github.com/RichardBarrell/">https://github.com/RichardBarrell/</a></td></tr>
+  </tbody></table>
+  <p>If you would like to speak to me via phone, I would be happy to arrange a call by email.</p>
+</section>
+
+<section id="skills">
+  <h2>Skills:</h2>
+  <table class="brief">
+    <tbody><tr><td>Python:</td><td>Much of my work at Team Rubber has been writing web application back-end software in Python, using Pyramid, Zope and Plone.</td></tr>
+    <tr><td>Linux:</td><td>I've administered and debugged CentOS and Ubuntu servers while working at Team Rubber. I routinely use Fedora as a desktop OS.</td></tr>
+    <tr><td>FreeBSD:</td><td>I maintained FreeBSD servers at Delib over a period of about four years and helped the company migrate all of its systems to CentOS.</td></tr>
+    <tr><td>Mac OS X:</td><td>I've worked on porting web applications through OS X upgrade cycles and have a passing familiarity with OS X.</td></tr>
+    <tr><td>Git:</td><td>I use Git for all personal and professional software work.</td></tr>
+    <tr><td>Javascript:</td><td>I've written front-end UI code for web applications using jQuery and HTML5.</td></tr>
+    <tr><td>C:</td><td>I program in C recreationally and write command-line tools in C.</td></tr>
+    <tr><td>Docker:</td><td>I use Docker for isolation and reproducibility on personal projects.</td></tr>
+    <tr><td>Haskell:</td><td>I program in Haskell recreationally.</td></tr>
+    <tr><td>Shell:</td><td>I use the Bourne shell extensively for all my work.</td></tr>
+    <tr><td>Java:</td><td>I picked up Java at university and am familiar with Java and the JVM.</td></tr>
+    <tr><td>Agile:</td><td>I’ve worked in projects using Kanban and Scrum and have a broad understanding of Lean and Agile principles.</td></tr>
+  </tbody></table>
+</section>
+
+<section id="experience">
+  <h2>Professional experience:</h2>
+
+  <p>I have worked at Team Rubber Ltd from June 2009 to June 2016. Team Rubber is an umbrella company with three subsidiaries called Delib, Rubber Republic and Viral Ad Network, each of which I have worked for as a computer programmer and systems administrator.</p>
+
+  <p>Most of my work at Team Rubber has been for Delib Ltd. This is a company which sells web apps to governments around the world for surveys and consultations. Major products and projects that I have worked on include:</p>
+
+  <p>Citizen Space, a web app for governments to run surveys online in order to consult citizens about decisions which will affect them. It can also be used to publish (possibly partly redacted) responses and direct people to consultations that are happening offline, such as meetings.</p>
+
+  <ul>
+  <li>I implemented the code that allows Citizen Space to work with 3rd-party mailing services such as MailChimp or GovDelivery, for customers who wish to use their own mailing list service instead of Citizen Space's built-in mailing list.</li>
+  <li>I wrote the database interaction layer for the response publishing features and participated extensively in the design and implementation of response publishing.</li>
+  <li>I worked on the survey implementation, starting with a project for the  UK government Central Office of Information to add features to Citizen Space's surveying and reporting features to meet their own requirements. I wrote or worked on features for that project such as: repopulating survey pages with saved answers when a respondent navigates back to a page they've already filled in; associating responses with each other; survey questions asking respondents to upload files; and survey editing workflow.</li>
+  <li>I wrote and worked on front-end Javascript for features such as: warning survey respondents before navigating away from a page before saving changes; collapsible boxes for putting related information in; streamlining by finding and removing unused code; HTML WYSIWYG editing; lightbox popups for illustrations; and sorting data tables.</li>
+  <li>I worked on the Varnish caching strategy that allowed Citizen Space's read-only use cases (such as browsing consultations to decide whether to fill them in, reading RSS feeds, reading explanatory material) to work for large numbers of members of the public browsing, with only modest server CPU requirements, despite the fact that the system used a web framework where HTTP requests for HTML pages would typically take on the order of 100ms of server-side CPU time.</li>
+  </ul>
+
+  <p>Budget Simulator, a web app that lets citizens interactively change funding allocations in a model of your organisation's budget. It shows how much effect changes in funding in each area will affect the overall budget. It presents information on what the results of making particular changes will be.</p>
+  <ul>
+  <li>I ported this application from Zope 2.4 to Zope 2.10, adding Unicode support in the process.</li>
+  <li>I made many customised microsites with bespoke feature changes for customers using the Zope 2.10 version.</li>
+  <li>I worked extensively on a commercially successful rebuild of this in 2014.</li>
+  <li>I was part of the team that rewrote the whole application from scratch using Pyramid on the back-end and HTML5, JavaScript, jQuery and jQuery UI and responsive CSS on the front end; the result of this was a single application that is pleasant and fun to use on phones, tablets and desktop computers.</li>
+  <li>I worked closely with the graphical designer on this project to turn rough prototypes of UI interactions written in JavaScript into more robust implementations.</li>
+  </ul>
+
+  <p>Dialogue, a web app for asking citizens to submit suggestions to deal with a particular issue and to rate and comment on submitted suggestions.</p>
+  <ul>
+  <li>Dialogue was used for a pair of very large consultations called the “Your Freedom” and “Spending Challenge” challenges shortly after the Conservative-Liberal Democrat coalition government took office in 2010. I joined the team working on Dialogue to add features that would be used for these consultations and to work on application performance in light of the large amount of traffic that these consultations needed to handle.</li>
+  <li>I used jMeter to benchmark Dialogue so that we could give our customers realistic measurements of the throughput they could expect from the applications.</li>
+  <li>I worked on moderation features to fix bottlenecks that came to light while the consultations were live, such as streamlined pages for central moderation of user-defined tags applied to suggestion threads.</li>
+  <li>I worked on hosting and tuning for these applications both before and while they were live to the public.</li>
+  </ul>
+
+  <p>Citizen Space Aggregator, a tool for showing off all of the public Citizen Space consultations on the internet online at any one time.</p>
+  <ul>
+  <li>I worked on the first iteration of this application, in which it was a component of Citizen Space.</li>
+  <li>In 2015 I wrote a complete new backend for Aggregator backed by Pyramid, SQLalchemy and PostgreSQL as a side project to gain experience with these technologies and to experiment with web app architecture.</li>
+  <li>One of my colleagues subsequently applied Delib's frontend UI libraries to it and we put it online at https://aggregator.citizenspace.com/</li>
+  </ul>
+
+  <p>An internal invoice tracking tool called Scully.</p>
+  <ul>
+  <li>I worked on UI features such as modal dialogues and searching.</li>
+  <li>I added SSL support to it and fixed several crash bugs.</li>
+  </ul>
+
+  <p>Delib’s hosting infrastructure:</p>
+  <ul>
+  <li>I procured, installed and eventually decommissioned servers and procured co-location and virtual servers with appropriate capacity and service levels for our applications.</li>
+  <li>I worked on formalising and codifying server set up instructions.</li>
+  <li>I worked on migrating Delib’s hosting from a mixture of FreeBSD versions and CentOS to an all CentOS environment with the goal of reducing our total operational complexity.</li>
+  <li>I worked on Delib’s server configuration management with Ansible.</li>
+  <li>I worked on migrating Delib’s hosting from co-located servers to an all-IaaS model running on public clouds.</li>
+  </ul>
+
+  <p>Delib’s technical customer support:</p>
+  <ul>
+  <li>I worked closely with Delib’s customer support team, diagnosing and constructing workarounds and fixed for technical issues that they ran into.</li>
+  </ul>
+
+  <p>I worked for two years at Viral Ad Network (“VAN”), a subsidiary of Team Rubber. VAN traded in advertising space on websites, buying ad space from publishers and using it to run customers’ advertising campaigns, akin to DoubleClick but operating in a specific niche. This arm of Team Rubber was eventually sold to a company called Sharethrough as part of Sharethrough’s expansion into the UK.</p>
+
+  <p>I worked extensively on the company’s monolithic supplier and customer management system, called Polarbear. I worked on both its front-end, on features such as searching and sorting, and on its back-end, implementing features and fixing both minor and production-stopping bugs.</p>
+  <p>I built a test container for manually testing ads that were implemented as Google Gadgets with VAN-specific libraries.</p>
+  <p>I fixed a large difficulty that the QA and development teams had with being able to set up working installations of VAN’s individual applications in order to be able to test and work on them, by creating Vagrant scripts for each application I worked on, starting from the imprecise installation instructions in each application’s documentation. By switching to using Vagrant for reproducibly building test environments, the QA team were able to start productively working on tickets in a period of minutes rather than hours, and the tendency of reported bugs to be rejected as configuration issues was alleviated.</p>
+  <p>I worked on fixing production issues with VAN’s running systems. For example, I once spotted and diagnosed a bug in VAN’s custom DNS responder which was causing it to fail to respond to approximately 10% of incoming requests, causing the company to lose revenue for every dropped request.</p>
+
+  <p>For several brief periods, I worked for Rubber Republic, a subsidiary of Team Rubber which makes advertising campaigns for a wide variety of customers. At the time I worked for Rubber Republic, the company's offerings included making marketing micro-sites to go with specific campaigns, some of which I worked on.</p>
+
+  <p>I worked on a microsite for Channel 4 series called “Hippo: Nature's Wild Feast”. I was one of three programmers on the project. We implemented a static blogging system that the series producers could use by uploading flat XML files, in order to accommodate their need to edit the site via a very limited satellite internet connection from rural Zambia.</p>
+
+  <p>I have also done various summer work in 2007-2005. Details are available on request.</p>
+</section>
+
+<section id="education">
+  <h2>Education:</h2>
+  <ul>
+  <li>2:2 BSc in Computer Science from the University of Bristol.</li>
+  <li>Four 'A' grades at A-level, in Physics, Chemistry, Mathematics and Electronics. Five 'A' grades and five 'A*' grades at GCSE, from St. Martins Comprehensive in Caerphilly, Wales.</li>
+  </ul>
+</section>
+
+<section id="referees">
+  <h2>References:</h2>
+  <p>Available on request; please feel free to email me.</p>
+</section>
+
+
+
+<div style="clear: both;"></div>
+<p id="copyright">© Copyright 2024 Richard Barrell</p>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-97645473-1', 'auto');
+  ga('send', 'pageview');
+</script>
+</div></body></html>

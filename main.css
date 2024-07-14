@@ -1,0 +1,104 @@
+#content {
+    width: 860px;
+    height: 100%;
+    margin: 50px auto;
+    /* this calc() is to stop page bouncing side to side if scrollbar appears
+     * and disappears, because vw doesn't shrink to make room for scrollbar. */
+    /* above is fallback to "auto" on browsers that don't support calc() */
+    margin: 10px calc(50vw - 472px);
+    padding: 40px;
+    background: #eee;
+    border: 1px #ccc solid;
+    color: #000;
+}
+section {
+    margin: 0 0 28px 0;
+}
+@media (max-width: 941px) {
+    #content {
+        margin: 50px auto;
+        width: auto;
+    }
+}
+body {
+    background: #ddd;
+    font-size: 18px;
+    font-family: sans-serif;
+    line-height: 1.2;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    /* in the specific edge case that:
+     * - there is a vertical scroll bar
+     * - and the browser window is 941px + delta wide
+     * - and delta < half the width of a browser scrollbar
+     * - then let the browser scrollbar overlap page slightly
+     * (which will look okay-ish because it only overlaps padding)
+    */
+    overflow-x: hidden;
+}
+a { color: #22c; }
+a:visited { color: #829; }
+h1, h2 {
+    padding: 0;
+    font-family: serif;
+}
+h1 { margin: 0 0 20px; }
+h2 { margin: 20px 0 5px 0; }
+ul, ol { margin: 8px 0; padding: 0 0 0 2em; }
+li { margin: 2px 0 2px; }
+p {
+    margin: 15px 0 15px;
+    padding: 0;
+}
+.code-block {
+    display: block;
+    margin: 15px 0;
+    padding: 20px;
+    background-color: #d3d3d3;
+    white-space: pre-wrap;
+    border: 1px solid #ccc;
+}
+#its-a-me {
+    float: right;
+    position: relative;
+    bottom: 1px;
+    left: 1px;
+    padding: 0;
+    margin: 0 0 20px 20px;
+    display: block;
+    border: 1px solid #ccc;
+}
+#copyright {
+    margin: 40px 0 10px 0;
+    font-size: 12px;
+    color: #333;
+    text-align: right;
+}
+nav.top-nav {
+    margin: 10px 0 35px 0;
+}
+nav.top-nav a {
+    margin: 0 20px 0 0px;
+    padding: 0 5px 5px 5px;
+    border-bottom: 1px solid #ccc;
+    font: bold 20px sans-serif;
+    text-decoration: none;
+}
+nav.under-nav {
+    text-align: right;
+}
+nav.under-nav a {
+    text-align: right;
+    font: bold 19px sans-serif;
+    margin: 0 0 2px 0;
+    text-decoration: none;
+}
+nav.under-nav a:after {
+    content: "";
+    display: block;
+}
+blockquote cite:before {
+    content: "— ";
+}

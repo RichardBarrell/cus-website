@@ -1,0 +1,191 @@
+<!doctype html>
+<html><head><meta charset="utf-8" />
+<title>Logging messages onto a strictly bounded queue is perilous</title>
+<link rel="stylesheet" href="normalize-5.0.css" />
+<link rel="stylesheet" href="main.css" />
+</head><body><div id="content">
+
+
+<h1>Logging messages onto a strictly bounded queue is perilous</h1>
+<nav class="top-nav">
+  <a href="/">Home</a>
+  <a href="/cv.html">C.V.</a>
+  <a href="/blog_list.html">Blog posts</a>
+  <a href="mailto:richard@brrll.co.uk">Contact</a>
+</nav>
+
+
+
+<nav class="under-nav">
+ <a href="blog-2017-04-17-ffmpeg-vod.html">
+  Previous post: Recording game videos with ShadowPlay and ffmpeg</a>
+ <a href="blog-2017-08-19-customer-service-101.html">
+  Next post: Customer support 101 for SMEs that sell software </a>
+</nav>
+
+<p>Imagine we have a complicated program with a logging framework in it which puts messages on a queue. One thread is responsible for taking log messages from the queue and writing them somewhere, such as a logstash instance or local database.</p>
+
+<p>Ideally we don't want to ever drop messages on the floor, even if the threads that add log messages go faster than the logging thread can save the messages. We can't buffer messages forever or we'll eventually just run out of memory and crash, so the only way out that never loses messages is to force the threads generating the messages to <em>slow down</em> if they outrace the logging thread too much.</p>
+
+<p> The obvious way to do this is with a blocking queue. Unfortunately, this is perilous in any system in which finalisers or signals can cause messages to be logged from any thread.</p>
+
+<h2>The setup:</h2>
+
+<p>Say we have the following program, which simulates the system described above:</p>
+
+<code class="code-block">try:
+    import queue
+except ImportError:
+    import Queue as queue
+
+from threading import Thread, current_thread
+import time
+import os
+import sys
+
+
+def usage():
+    print("Usage: %s &lt;MAX_SIZE&gt;" % sys.argv[0])
+    print(" where MAX_SIZE is an integer >= 0.")
+    print("")
+    print("If MAX_SIZE is 0, model an unbounded log message queue,")
+    print("otherwise model a queue holding up to MAX_SIZE messages.")
+    sys.exit(1)
+
+
+if not len(sys.argv) == 2:
+    usage()
+MAX_SIZE = int(sys.argv[1], base=10)
+if MAX_SIZE &lt; 0:
+    usage()
+
+message_queue = queue.Queue(maxsize=MAX_SIZE)
+
+
+class HLD(object):
+    def __del__(self):
+        message = u"%r destroyed %r\n" % (current_thread().name, self)
+        os.write(1, message.encode("utf-8"))
+        message_queue.put(message)
+
+    def __repr__(self):
+        return 'HLD(%r)' % (id(self),)
+
+
+def in_read_thread():
+    while True:
+        item = message_queue.get()
+        message = u"reader dequeued (%r)\n" % (item,)
+        os.write(1, message.encode("utf-8"))
+
+        # This block allocates cyclic garbage in order to
+        # make the gc sometimes activate on the read thread.
+        # For a faster repro, replace this block with:
+        #  import gc; gc.collect()
+        for _ in range(2):
+            trash = [object() for _ in range(100)]
+            trash.append(trash)
+            trash = None
+
+
+def in_write_thread():
+    while True:
+        # This block allocates cyclic garbage which has references to HLD
+        # objects. The HLD objects themselves aren't part of the cycles,
+        # so this cyclic garbage can be collected at some point.
+        trash = [HLD() for _ in range(10)]
+        trash.append(trash)
+        trash = None
+        time.sleep(0.1)
+        message_queue.put(u"Hello from write thread!")
+
+
+read_thread = Thread(target=in_read_thread)
+read_thread.name = "read_thread"
+read_thread.daemon = True
+read_thread.start()
+
+write_thread = Thread(target=in_write_thread)
+write_thread.name = "write_thread"
+write_thread.daemon = True
+write_thread.start()
+
+while True:
+    # Pause the main thread indefinitely (until the program is interrupted
+    # by pressing control-C at the terminal). Use time.sleep() for this
+    # rather than a lock or Thread.join(), because Python 2 has a bug
+    # wherein signals such as KeyboardInterrupt can't be delivered
+    # when the main thread is block on any kind of mutex.
+    # This bug appears to have been fixed in Python 3.
+    time.sleep(100)</code>
+
+<p>If you run this program with the argument 0, it will simulate a system with an unbounded queue for log messages. If you run it with any positive argument, it will simulate a system with a strictly bounded queue for log messages.</p>
+
+<p>Unfortunately, when the queue is bounded, it manifests a deadlock bug.</p>
+
+<p>The <code>HLD</code> class models a type of object which sometimes logs a message from its finaliser (the <code>__del__</code> method). This can happen in practical frameworks where, for example, exceptions get raised from buggy code in finalisers. We need to log these so we can find out about and fix the bugs.</p>
+
+<p>The <code>read_thread</code> executes the function <code>in_read_thread()</code>. It accepts log messages from the log queue, saves them somewhere (in this case, stdout) and in the process allocates some garbage. The deliberate garbage allocations in this code are a simulation of doing something slightly complicated with the messages, like formatting them to put into a database through an ORM.</p>
+
+<p>The <code>write_thread</code> executes the function <code>in_write_thread()</code>. It writes log messages to the log queue and allocates garbage, simulating the program doing real work and responding to user requests. Some of the garbage it allocates has finalisers that will emit log messages.</p>
+
+<h2>The punchline:</h2>
+
+<p>When the garbage collector kicks in, some <code>HLD</code> objects will be destroyed, have their finalisers run, and emit log messages.</p>
+
+<p>If the garbage collector kicks in on the <code>write_thread</code> then nothing goes wrong; if there are too many of them all at once for the <code>read_thread</code> to deal with, the <code>write_thread</code> will simply slow down and wait for the <code>read_thread</code>.</p>
+
+<p>In the output from our simulation, this will tend to look like:</p>
+
+<pre class="code-block">'write_thread' destroyed HLD(140364268959120)
+'write_thread' destroyed HLD(140364268959056)
+reader dequeued (u"'write_thread' destroyed HLD(140364268958032)\n")
+'write_thread' destroyed HLD(140364268958992)
+reader dequeued (u"'write_thread' destroyed HLD(140364268957968)\n")
+'write_thread' destroyed HLD(140364268958928)
+reader dequeued (u"'write_thread' destroyed HLD(140364268957904)\n")
+'write_thread' destroyed HLD(140364268958864)
+reader dequeued (u"'write_thread' destroyed HLD(140364268959120)\n")
+'write_thread' destroyed HLD(140364268958800)
+reader dequeued (u"'write_thread' destroyed HLD(140364268959056)\n")</pre>
+
+<p>If the garbage collector kicks in on the <code>read_thread</code> instead, then the system can deadlock when the queue is bounded. When the finaliser for a <code>HLD</code> object is run on the <code>read_thread</code>, it will try to log a message to the queue. The queue might, at this point, be full. If it is, then the reader thread will block in the <code>HLD</code> object's finaliser. It can't ever be unblocked, because it can't return from the <code>HLD</code> object's finaliser in order to drain the logging queue to make room for the message it is currently waiting for a change to add!</p>
+
+<p>In the output from our simulation, (with <code>MAX_SIZE==4</code>) this looks like:</p>
+
+<pre class="code-block">reader dequeued (u'Hello from write thread!')
+reader dequeued (u'Hello from write thread!')
+reader dequeued (u'Hello from write thread!')
+'read_thread' destroyed HLD(140364269227472)
+'read_thread' destroyed HLD(140364269227408)
+'read_thread' destroyed HLD(140364269227344)
+'read_thread' destroyed HLD(140364269227280)
+'read_thread' destroyed HLD(140364269227216)</pre>
+
+<p>And there it freezes, deadlocked.</p>
+
+<p>Tragic!</p>
+
+<h2>The respite:</h2>
+
+<p>One way out of this conundrum is to move the message queue out of the process, into a separate process which does nothing but drain the queue and does not ever log messages itself.</p>
+
+<p>Another possibility is to change the method for adding messages to the queue to refrain from blocking if called from the <code>read_thread</code>. However, we're now back to worrying about how we can't buffer messages forever. If we go down this route, we'll either have to drop messages on the floor, or hope <em>really hard</em> that any messages that happen to get added by the logging thread itself don't happen to be large enough to exhaust available memory. This may be entirely practical; many programs don't ever allocate very many objects with finalisers.</p>
+
+<p>A less practical idea is to make sure that signals and finalisers can't cause messages to be logged from the <code>read_thread</code>. In Python, it's easy enough to arrange for signals never to arrive on the thread which is draining the queue - simply make sure that the log message queue is drained from some thread that is not the 'main' thread, because Python only delivers signals to the 'main' thread. However, avoiding logging messages from finalisers is not so practical. If we <em>have</em> finalisers at all then eventually we'll probably find bugs in them, and if our logging system doesn't help us get the exception messages and tracebacks so we can try to fix them, then the logging system isn't actually doing us any good.</p>
+
+<p>One idea which will <em>not</em> work is simply adding more than one logging thread, in the hope that the second thread will always unblock the first. The big problem is that two (or more!) readers can <em>both</em> block if they each log a message at the wrong time. A smaller issue is that, if having more than one thread doing the actual writing-down of messages isn't a problem for, why use a queue at all? We could just change the logging mechanism to write down the messages directly without the queue.</p>
+
+
+
+<div style="clear: both;"></div>
+<p id="copyright">© Copyright 2024 Richard Barrell</p>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-97645473-1', 'auto');
+  ga('send', 'pageview');
+</script>
+</div></body></html>
