@@ -1,37 +1,71 @@
 <!doctype html>
-<html><head><meta charset="utf-8" />
-<title>Four dumb questions I'd like to ask hardware designers</title>
-<link rel="stylesheet" href="normalize-5.0.css" />
-<link rel="stylesheet" href="main.css" />
-</head><body><div id="content">
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Four dumb questions I'd like to ask hardware designers</title>
+    <link rel="stylesheet" href="normalize-5.0.css" />
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body>
+    <div id="content">
+      
+      <h1>Four dumb questions I'd like to ask hardware designers</h1>
+      <nav class="top-nav">
+        <a href="/">Home</a>
+        <a href="/cv.html">C.V.</a>
+        <a href="/blog_list.html">Blog posts</a>
+        <a href="mailto:richard@brrll.co.uk">Contact</a>
+      </nav>
 
+      
+    <nav class="under-nav">
+      
+      <a href="blog-2017-03-24-three-copies.html">
+        Next post: Zero-copy? How about three?
+      </a>
+    </nav>
 
-<h1>Four dumb questions I'd like to ask hardware designers</h1>
-<nav class="top-nav">
-  <a href="/">Home</a>
-  <a href="/cv.html">C.V.</a>
-  <a href="/blog_list.html">Blog posts</a>
-  <a href="mailto:richard@brrll.co.uk">Contact</a>
-</nav>
+    <p>
+  Given that an x86 doesn't touch memory in anything less than 64-byte
+  increments (since that's the cache line size), and that the slow part of a
+  lock cmpxchg8/16b instruction is
+  <em>acquiring exclusive use of the relevant cache line</em> rather than
+  <em>comparing the contents of the source and targets</em>, how come there
+  isn't a lock cmpxchg64b instruction, just to make lock-free algorithms easier?
+</p>
 
+<p>
+  Regarding the
+  <a
+    href="http://yosefk.com/blog/the-overblown-frequency-vs-cost-efficiency-trade-off.html"
+    >frequency vs cost efficiency trade-off</a
+  >, are current GPUs (which seem to run at somewhere around 1.0 to 1.5GHz
+  rather than up in the 3GHz+ range) sitting pretty much precisely on the
+  optimal point for cost-efficiency?
+</p>
 
+<p>
+  How could REP MOVSB ever be slower than memcpy() on an x86 CPU that has a
+  microcode unit? If there did exist some memcpy() implementation faster than
+  REP MOVSB, couldn't the REP MOVSB implementation be sped up to match it by
+  simply having it issue the same microcode ops that the faster memcpy()
+  implementation would have issued too?
+</p>
 
-<nav class="under-nav">
- 
- <a href="blog-2017-03-24-three-copies.html">
-  Next post: Zero-copy? How about three? </a>
-</nav>
+<p>
+  Do multicore ARM systems see a practical improvement compared to x86es in how
+  much power or performance they spend on inter-core coordination from the fact
+  that they implement a weaker memory model?
+</p>
 
-<p>Given that an x86 doesn't touch memory in anything less than 64-byte increments (since that's the cache line size), and that the slow part of a lock cmpxchg8/16b instruction is <em>acquiring exclusive use of the relevant cache line</em> rather than <em>comparing the contents of the source and targets</em>, how come there isn't a lock cmpxchg64b instruction, just to make lock-free algorithms easier?</p>
+  
 
-<p>Regarding the <a href="http://yosefk.com/blog/the-overblown-frequency-vs-cost-efficiency-trade-off.html">frequency vs cost efficiency trade-off</a>, are current GPUs (which seem to run at somewhere around 1.0 to 1.5GHz rather than up in the 3GHz+ range) sitting pretty much precisely on the optimal point for cost-efficiency?</p>
+      <div style="clear: both"></div>
+      <p id="copyright">
+        © Copyright 2024 Richard
+        Barrell
+      </p>
+    </div>
+  </body>
+</html>
 
-<p>How could REP MOVSB ever be slower than memcpy() on an x86 CPU that has a microcode unit? If there did exist some memcpy() implementation faster than REP MOVSB, couldn't the REP MOVSB implementation be sped up to match it by simply having it issue the same microcode ops that the faster memcpy() implementation would have issued too?</p>
-
-<p>Do multicore ARM systems see a practical improvement compared to x86es in how much power or performance they spend on inter-core coordination from the fact that they implement a weaker memory model?</p>
-
-
-
-<div style="clear: both;"></div>
-<p id="copyright">© Copyright 2024 Richard Barrell</p>
-</div></body></html>

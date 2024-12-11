@@ -1,91 +1,217 @@
 <!doctype html>
-<html><head><meta charset="utf-8" />
-<title>Recording game videos with ShadowPlay and ffmpeg</title>
-<link rel="stylesheet" href="normalize-5.0.css" />
-<link rel="stylesheet" href="main.css" />
-</head><body><div id="content">
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Recording game videos with ShadowPlay and ffmpeg</title>
+    <link rel="stylesheet" href="normalize-5.0.css" />
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body>
+    <div id="content">
+      
+      <h1>Recording game videos with ShadowPlay and ffmpeg</h1>
+      <nav class="top-nav">
+        <a href="/">Home</a>
+        <a href="/cv.html">C.V.</a>
+        <a href="/blog_list.html">Blog posts</a>
+        <a href="mailto:richard@brrll.co.uk">Contact</a>
+      </nav>
 
+      
+    <nav class="under-nav">
+      <a href="blog-2017-03-24-three-copies.html">
+        Previous post: Zero-copy? How about three?</a
+      
+      >
+      <a href="blog-2017-04-19-bounded-log-queue.html">
+        Next post: Logging messages onto a strictly bounded queue is perilous
+      </a>
+    </nav>
 
-<h1>Recording game videos with ShadowPlay and ffmpeg</h1>
-<nav class="top-nav">
-  <a href="/">Home</a>
-  <a href="/cv.html">C.V.</a>
-  <a href="/blog_list.html">Blog posts</a>
-  <a href="mailto:richard@brrll.co.uk">Contact</a>
-</nav>
-
-
-
-<nav class="under-nav">
- <a href="blog-2017-03-24-three-copies.html">
-  Previous post: Zero-copy? How about three?</a>
- <a href="blog-2017-04-19-bounded-log-queue.html">
-  Next post: Logging messages onto a strictly bounded queue is perilous </a>
-</nav>
-
-<p>Occasionally, I want to record myself playing a videogame. I use Nvidia's ShadowPlay for this, which sorta got renamed to “GeForce Experience” a while back. I don't currently attempt to stream video because the internet connection I have right now doesn't have enough upstream bandwidth.</p>
+    <p>
+  Occasionally, I want to record myself playing a videogame. I use Nvidia's
+  ShadowPlay for this, which sorta got renamed to “GeForce Experience” a while
+  back. I don't currently attempt to stream video because the internet
+  connection I have right now doesn't have enough upstream bandwidth.
+</p>
 
 <p>For high-quality smooth VOD recording:</p>
 
 <ul>
-  <li>You want hardware-accelerated h264 encoding. Both Nvidia and AMD GPUs now come with hardware for video encoding and they publish APIs for it. The GPU vendors' own software (like ShadowPlay) uses this, but so will decent 3rd party video capture software. The benefit of this is that it makes recording have no appreciable effect on framerate.</li>
-  <li>You want to stream the video onto a different hard drive than the one which the videogame you are playing is installed. This makes recording not affect loading times very much, though it'll still make them a little worse by consuming some RAM. It also avoids having the game deprive the video stream of needed disk throughput, which ties in to the next point.</li>
-  <li>You want to stream the video onto a hard drive which is otherwise idle. I would expect a plug-in USB 2.0 hard disk to be fast enough. It will need to sustain about 5MB/s of writes. USB2 can do about 30 to 35MB/s. Your recording software can buffer saved video in memory only briefly. If the disk you're streaming the video onto sometimes fails to keep up, you'll get gaps and skipping in the VOD file.</li>
+  <li>
+    You want hardware-accelerated h264 encoding. Both Nvidia and AMD GPUs now
+    come with hardware for video encoding and they publish APIs for it. The GPU
+    vendors' own software (like ShadowPlay) uses this, but so will decent 3rd
+    party video capture software. The benefit of this is that it makes recording
+    have no appreciable effect on framerate.
+  </li>
+  <li>
+    You want to stream the video onto a different hard drive than the one which
+    the videogame you are playing is installed. This makes recording not affect
+    loading times very much, though it'll still make them a little worse by
+    consuming some RAM. It also avoids having the game deprive the video stream
+    of needed disk throughput, which ties in to the next point.
+  </li>
+  <li>
+    You want to stream the video onto a hard drive which is otherwise idle. I
+    would expect a plug-in USB 2.0 hard disk to be fast enough. It will need to
+    sustain about 5MB/s of writes. USB2 can do about 30 to 35MB/s. Your
+    recording software can buffer saved video in memory only briefly. If the
+    disk you're streaming the video onto sometimes fails to keep up, you'll get
+    gaps and skipping in the VOD file.
+  </li>
 </ul>
 
-<p>As for video quality, I found that the Nvidia hardware encoder (at least with my GPU, a GeForce 650Ti) is not very good at producing compact, high-quality video files. It can produce files that are almost small enough, but at abysmal quality. Alternatively, it can produce files that are high enough quality, high far too large. In order to get around this, what I do is:</p>
+<p>
+  As for video quality, I found that the Nvidia hardware encoder (at least with
+  my GPU, a GeForce 650Ti) is not very good at producing compact, high-quality
+  video files. It can produce files that are almost small enough, but at abysmal
+  quality. Alternatively, it can produce files that are high enough quality,
+  high far too large. In order to get around this, what I do is:
+</p>
 
 <ol>
-  <li>I record with all the quality settings in ShadowPlay set to maximum. That is, 1080p resolution, 60Hz framerate and 50Mbit/s bitrate.</li>
-  <li>I use a command-line program called ffmpeg to re-encode them to much smaller files (about 10% to 20% the size) with only slightly lower quality.</li>
-  <li>I check that the recompressed output files look okay, then delete the original huge VOD files.</li>
+  <li>
+    I record with all the quality settings in ShadowPlay set to maximum. That
+    is, 1080p resolution, 60Hz framerate and 50Mbit/s bitrate.
+  </li>
+  <li>
+    I use a command-line program called ffmpeg to re-encode them to much smaller
+    files (about 10% to 20% the size) with only slightly lower quality.
+  </li>
+  <li>
+    I check that the recompressed output files look okay, then delete the
+    original huge VOD files.
+  </li>
   <li>I upload the recompressed output files to YouTube overnight.</li>
 </ol>
 
-<p>If you are uploading to YouTube, YouTube will re-encode your video on their servers. I believe this is partly so that YouTube can control video formats and bitrates themselves, and partly so that YouTube can prevent miscreants from breaking into other peoples' computers by uploading malformed video files with exploits in them.</p>
+<p>
+  If you are uploading to YouTube, YouTube will re-encode your video on their
+  servers. I believe this is partly so that YouTube can control video formats
+  and bitrates themselves, and partly so that YouTube can prevent miscreants
+  from breaking into other peoples' computers by uploading malformed video files
+  with exploits in them.
+</p>
 
-<p>As far as I can tell, for game recordings on YouTube it's best to upload video files at 60Hz framerate and 1080p resolution. I think this is because the ratio of bitrate to pixels that YouTube gives you is roughly constant, so the more pixels you shove in, the more frame coherence the encoder can take advantage of to make your pixels be pretty within its bitrate budget. Trying to get “fewer pixels, but more bits per pixel” on YouTube does not appear to work; if you downscale a video to 720p before uploading, YouTube will give you a lower bitrate than if you had uploaded it at 1080p.</p>
+<p>
+  As far as I can tell, for game recordings on YouTube it's best to upload video
+  files at 60Hz framerate and 1080p resolution. I think this is because the
+  ratio of bitrate to pixels that YouTube gives you is roughly constant, so the
+  more pixels you shove in, the more frame coherence the encoder can take
+  advantage of to make your pixels be pretty within its bitrate budget. Trying
+  to get “fewer pixels, but more bits per pixel” on YouTube does not appear to
+  work; if you downscale a video to 720p before uploading, YouTube will give you
+  a lower bitrate than if you had uploaded it at 1080p.
+</p>
 
 <p>The ffmpeg command that I use for reencoding a video from ShadowPlay is:</p>
 
-<code class="code-block">ffmpeg -i <em>input_file_from_shadowplay.mp4</em>                         \
-       -c:a copy                                                 \
-       -c:v libx264 -bf 2 -flags +cgop -pix_fmt yuv420p -crf 28  \
-       -preset slow                                              \
-       <em>output_file_from_ffmpeg.mkv</em></code>
+<code class="code-block"
+  >ffmpeg -i <em>input_file_from_shadowplay.mp4</em> \ -c:a copy \ -c:v libx264
+  -bf 2 -flags +cgop -pix_fmt yuv420p -crf 28 \ -preset slow \
+  <em>output_file_from_ffmpeg.mkv</em></code
+>
 
-<p>On my desktop computer with an Intel i3-4130 CPU, this takes roughly 3 seconds to encode each second of input video. It produces output files at about 6 Mbit/s (or about 45 megabytes per minute). Here are a couple of examples of what the output quality from that looks like, after being uploaded to Youtube:</p>
+<p>
+  On my desktop computer with an Intel i3-4130 CPU, this takes roughly 3 seconds
+  to encode each second of input video. It produces output files at about 6
+  Mbit/s (or about 45 megabytes per minute). Here are a couple of examples of
+  what the output quality from that looks like, after being uploaded to Youtube:
+</p>
 <ul>
-  <li><a href="https://www.youtube.com/watch?v=K9VDVQIoX04">Boganella is the best gun.</a></li>
-  <li><a href="https://www.youtube.com/watch?v=6G7GPEtkWu8">Racecourse on Hossin! We drive around it for a bit.</a></li>
+  <li>
+    <a href="https://www.youtube.com/watch?v=K9VDVQIoX04"
+      >Boganella is the best gun.</a
+    >
+  </li>
+  <li>
+    <a href="https://www.youtube.com/watch?v=6G7GPEtkWu8"
+      >Racecourse on Hossin! We drive around it for a bit.</a
+    >
+  </li>
 </ul>
 
-<p>The ffmpeg command that is recommended (according to <a href="https://www.virag.si/2015/06/encoding-videos-for-youtube-with-ffmpeg/">Jernej Virag's helpful post</a>) is:</p>
+<p>
+  The ffmpeg command that is recommended (according to
+  <a
+    href="https://www.virag.si/2015/06/encoding-videos-for-youtube-with-ffmpeg/"
+    >Jernej Virag's helpful post</a
+  >) is:
+</p>
 
-<code class="code-block">ffmpeg -i <em>input_file_from_shadowplay.mp4</em>                         \
-       -c:a aac -b:a 384 -r:a 48000                              \
-       -c:v libx264 -bf 2 -flags +cgop -pix_fmt yuv420p -crf 21  \
-       -preset slow                                              \
-       <em>output_file_from_ffmpeg.mkv</em></code>
+<code class="code-block"
+  >ffmpeg -i <em>input_file_from_shadowplay.mp4</em> \ -c:a aac -b:a 384 -r:a
+  48000 \ -c:v libx264 -bf 2 -flags +cgop -pix_fmt yuv420p -crf 21 \ -preset
+  slow \ <em>output_file_from_ffmpeg.mkv</em></code
+>
 
-<p>There are two differences between the one I'm using in practice and the recommended one.</p>
+<p>
+  There are two differences between the one I'm using in practice and the
+  recommended one.
+</p>
 <ol>
-  <li>The one I use doesn't bother to re-encode the audio (that's what the <code>c:a</code>, <code>b:a</code> and <code>r:a</code> bits are about) because the audio encoding that ShadowPlay uses itself seems okay to me.</li>
-  <li>I use a slightly lower quality (that's what the “crf” thing is: <code>-crf 21</code> is higher quality but bigger files than <code>-crf 28</code>).</li>
+  <li>
+    The one I use doesn't bother to re-encode the audio (that's what the
+    <code>c:a</code>, <code>b:a</code> and <code>r:a</code> bits are about)
+    because the audio encoding that ShadowPlay uses itself seems okay to me.
+  </li>
+  <li>
+    I use a slightly lower quality (that's what the “crf” thing is:
+    <code>-crf 21</code> is higher quality but bigger files than
+    <code>-crf 28</code>).
+  </li>
 </ol>
 
-<p>(Eagle-eyed readers may also notice that Jernej specifies a <code>-strict -2</code> option in order to get aac audio encoding to work, but that was only necessary for older versions of ffmpeg.)</p>
+<p>
+  (Eagle-eyed readers may also notice that Jernej specifies a
+  <code>-strict -2</code> option in order to get aac audio encoding to work, but
+  that was only necessary for older versions of ffmpeg.)
+</p>
 
-<p>If you change <code>-preset slow</code> to <code>-preset slower</code> or <code>-preset slowest</code> then you'll tend to get smaller files at the same quality, but it'll take longer to encode. I picked <code>-preset slow</code> as a tradeoff between how long the files take to encode versus how long they take to upload on my internet connection.</p>
+<p>
+  If you change <code>-preset slow</code> to <code>-preset slower</code> or
+  <code>-preset slowest</code> then you'll tend to get smaller files at the same
+  quality, but it'll take longer to encode. I picked
+  <code>-preset slow</code> as a tradeoff between how long the files take to
+  encode versus how long they take to upload on my internet connection.
+</p>
 
-<p>I use <code>.mkv</code> as the container format for two reasons. The less important reason is that this way I can tell from the name whether a given file is an original from ShadowPlay or one that I have recompressed with ffmpeg. The originals all have the extension <code>.mp4</code> while the recompressed ones all have the extension <code>.mkv</code>.</p>
+<p>
+  I use <code>.mkv</code> as the container format for two reasons. The less
+  important reason is that this way I can tell from the name whether a given
+  file is an original from ShadowPlay or one that I have recompressed with
+  ffmpeg. The originals all have the extension <code>.mp4</code> while the
+  recompressed ones all have the extension <code>.mkv</code>.
+</p>
 
-<p>The more important reason for using <code>.mkv</code> is that YouTube can save you time by doing its re-encoding of your videos concurrently with you uploading them. If this kicks in, your videos can go live sooner. If it doesn't kick in, YouTube won't begin re-encoding your video until the upload is completely finished.</p>
+<p>
+  The more important reason for using <code>.mkv</code> is that YouTube can save
+  you time by doing its re-encoding of your videos concurrently with you
+  uploading them. If this kicks in, your videos can go live sooner. If it
+  doesn't kick in, YouTube won't begin re-encoding your video until the upload
+  is completely finished.
+</p>
 
-<p>Whether concurrent encoding on YouTube kicks in depends on the specifics of the container format (like <code>.mkv</code>, <code>.avi</code> or <code>.mov</code>) that the video is inside, not the codecs (like h264, Theora or MPEG-2). While there are options for ffmpeg that will produce <code>.mp4</code> or <code>.avi</code> files that work for concurrent encoding, it's much easier to just use <code>.mkv</code> format. Because <code>.mkv</code> is well designed for streaming, it just works immediately with no fussing.</p>
+<p>
+  Whether concurrent encoding on YouTube kicks in depends on the specifics of
+  the container format (like <code>.mkv</code>, <code>.avi</code> or
+  <code>.mov</code>) that the video is inside, not the codecs (like h264, Theora
+  or MPEG-2). While there are options for ffmpeg that will produce
+  <code>.mp4</code> or <code>.avi</code> files that work for concurrent
+  encoding, it's much easier to just use <code>.mkv</code> format. Because
+  <code>.mkv</code> is well designed for streaming, it just works immediately
+  with no fussing.
+</p>
 
+  
 
+      <div style="clear: both"></div>
+      <p id="copyright">
+        © Copyright 2024 Richard
+        Barrell
+      </p>
+    </div>
+  </body>
+</html>
 
-<div style="clear: both;"></div>
-<p id="copyright">© Copyright 2024 Richard Barrell</p>
-</div></body></html>
