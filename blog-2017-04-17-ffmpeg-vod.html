@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Recording game videos with ShadowPlay and ffmpeg</title>
     <link rel="stylesheet" href="normalize-5.0.css" />
     <link rel="stylesheet" href="main.css" />
@@ -107,11 +108,11 @@
 
 <p>The ffmpeg command that I use for reencoding a video from ShadowPlay is:</p>
 
-<code class="code-block"
-  >ffmpeg -i <em>input_file_from_shadowplay.mp4</em> \ -c:a copy \ -c:v libx264
-  -bf 2 -flags +cgop -pix_fmt yuv420p -crf 28 \ -preset slow \
-  <em>output_file_from_ffmpeg.mkv</em></code
->
+<pre class="code-block">ffmpeg -i <em>input_file_from_shadowplay.mp4</em> \
+    -c:a copy \
+    -c:v libx264 -bf 2 -flags +cgop -pix_fmt yuv420p -crf 28 \
+    -preset slow \
+    <em>output_file_from_ffmpeg.mkv</em></pre>
 
 <p>
   On my desktop computer with an Intel i3-4130 CPU, this takes roughly 3 seconds
@@ -140,11 +141,11 @@
   >) is:
 </p>
 
-<code class="code-block"
-  >ffmpeg -i <em>input_file_from_shadowplay.mp4</em> \ -c:a aac -b:a 384 -r:a
-  48000 \ -c:v libx264 -bf 2 -flags +cgop -pix_fmt yuv420p -crf 21 \ -preset
-  slow \ <em>output_file_from_ffmpeg.mkv</em></code
->
+<pre class="code-block">ffmpeg -i <em>input_file_from_shadowplay.mp4</em> \
+    -c:a aac -b:a 384 -r:a 48000 \
+    -c:v libx264 -bf 2 -flags +cgop -pix_fmt yuv420p -crf 21 \
+    -preset slow \
+    <em>output_file_from_ffmpeg.mkv</em></pre>
 
 <p>
   There are two differences between the one I'm using in practice and the

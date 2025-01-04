@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Richard Barrell</title>
     <link rel="stylesheet" href="normalize-5.0.css" />
     <link rel="stylesheet" href="main.css" />
@@ -9,7 +10,13 @@
   <body>
     <div id="content">
       
-    <img src="selfie.jpg" alt="Picture of Richard's face" id="its-a-me" />
+    <img
+      src="selfie.jpg"
+      alt="Picture of Richard's face"
+      id="its-a-me"
+      width="300"
+      height="415"
+    />
   
       <h1>Richard Barrell</h1>
       <nav class="top-nav">
@@ -20,6 +27,19 @@
       </nav>
 
       
+    <style type="text/css">
+      @media (max-width: 941px) {
+        #its-a-me {
+          width: calc(max(300 / 940 * 100vw, 151px));
+          height: auto;
+        }
+      }
+      @media (max-width: 376px) {
+        #its-a-me {
+          display: none;
+        }
+      }
+    </style>
     <section>
       <p>Hi, I'm Richard.</p>
       <p>I write computer programs.</p>

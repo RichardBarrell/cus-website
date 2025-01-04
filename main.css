@@ -1,11 +1,8 @@
 #content {
   width: 860px;
   height: 100%;
-  margin: 50px auto;
-  /* this calc() is to stop page bouncing side to side if scrollbar appears
-     * and disappears, because vw doesn't shrink to make room for scrollbar. */
-  /* above is fallback to "auto" on browsers that don't support calc() */
-  margin: 10px calc(50vw - 472px);
+  margin: 20px auto;
+  box-sizing: border-box;
   padding: 40px;
   background: #eee;
   border: 1px #ccc solid;
@@ -16,8 +13,14 @@ section {
 }
 @media (max-width: 941px) {
   #content {
-    margin: 50px auto;
+    margin: 20px 40px;
+    padding: 40px calc(10px + (30 / 940 * 100vw));
     width: auto;
+  }
+}
+@media (max-width: 541px) {
+  #content {
+    margin: 20px calc(40 / 540 * 100vw);
   }
 }
 body {
@@ -72,16 +75,15 @@ p {
   margin: 15px 0;
   padding: 20px;
   background-color: #d3d3d3;
-  white-space: pre-wrap;
   border: 1px solid #ccc;
+}
+.code-block pre {
+  white-space: pre-wrap;
 }
 #its-a-me {
   float: right;
-  position: relative;
-  bottom: 1px;
-  left: 1px;
   padding: 0;
-  margin: 0 0 20px 20px;
+  margin: 0 0 15px 15px;
   display: block;
   border: 1px solid #ccc;
 }
@@ -92,22 +94,32 @@ p {
   text-align: right;
 }
 nav.top-nav {
-  margin: 10px 0 35px 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0 0 10px 0;
 }
 nav.top-nav a {
-  margin: 0 20px 0 0px;
-  padding: 0 5px 5px 5px;
-  border-bottom: 1px solid #ccc;
+  display: block;
+  flex: 0 0 auto;
   font: bold 20px sans-serif;
+  padding: 0 0 5px 0;
+  border-bottom: 1px solid #ccc;
+  margin: 0 20px 5px 0px;
   text-decoration: none;
 }
 nav.under-nav {
-  text-align: right;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: end;
+  margin: 0 0 10px 0;
 }
 nav.under-nav a {
-  text-align: right;
-  font: bold 19px sans-serif;
-  margin: 0 0 2px 0;
+  display: block;
+  flex: 0 0 auto;
+  font: bold 16px sans-serif;
+  margin: 0 0 10px 0;
   text-decoration: none;
 }
 nav.under-nav a:after {

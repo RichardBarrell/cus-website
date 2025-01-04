@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Logging messages onto a strictly bounded queue is perilous</title>
     <link rel="stylesheet" href="normalize-5.0.css" />
     <link rel="stylesheet" href="main.css" />
@@ -56,38 +57,92 @@
   Say we have the following program, which simulates the system described above:
 </p>
 
-<code class="code-block"
-  >try: import queue except ImportError: import Queue as queue from threading
-  import Thread, current_thread import time import os import sys def usage():
-  print("Usage: %s &lt;MAX_SIZE&gt;" % sys.argv[0]) print(" where MAX_SIZE is an
-  integer >= 0.") print("") print("If MAX_SIZE is 0, model an unbounded log
-  message queue,") print("otherwise model a queue holding up to MAX_SIZE
-  messages.") sys.exit(1) if not len(sys.argv) == 2: usage() MAX_SIZE =
-  int(sys.argv[1], base=10) if MAX_SIZE &lt; 0: usage() message_queue =
-  queue.Queue(maxsize=MAX_SIZE) class HLD(object): def __del__(self): message =
-  u"%r destroyed %r\n" % (current_thread().name, self) os.write(1,
-  message.encode("utf-8")) message_queue.put(message) def __repr__(self): return
-  'HLD(%r)' % (id(self),) def in_read_thread(): while True: item =
-  message_queue.get() message = u"reader dequeued (%r)\n" % (item,) os.write(1,
-  message.encode("utf-8")) # This block allocates cyclic garbage in order to #
-  make the gc sometimes activate on the read thread. # For a faster repro,
-  replace this block with: # import gc; gc.collect() for _ in range(2): trash =
-  [object() for _ in range(100)] trash.append(trash) trash = None def
-  in_write_thread(): while True: # This block allocates cyclic garbage which has
-  references to HLD # objects. The HLD objects themselves aren't part of the
-  cycles, # so this cyclic garbage can be collected at some point. trash =
-  [HLD() for _ in range(10)] trash.append(trash) trash = None time.sleep(0.1)
-  message_queue.put(u"Hello from write thread!") read_thread =
-  Thread(target=in_read_thread) read_thread.name = "read_thread"
-  read_thread.daemon = True read_thread.start() write_thread =
-  Thread(target=in_write_thread) write_thread.name = "write_thread"
-  write_thread.daemon = True write_thread.start() while True: # Pause the main
-  thread indefinitely (until the program is interrupted # by pressing control-C
-  at the terminal). Use time.sleep() for this # rather than a lock or
-  Thread.join(), because Python 2 has a bug # wherein signals such as
-  KeyboardInterrupt can't be delivered # when the main thread is block on any
-  kind of mutex. # This bug appears to have been fixed in Python 3.
-  time.sleep(100)</code
+<pre class="code-block">
+try:
+    import queue
+except ImportError:
+    import Queue as queue
+
+from threading import Thread, current_thread
+import time
+import os
+import sys
+
+
+def usage():
+    print("Usage: %s &lt;MAX_SIZE&gt;" % sys.argv[0])
+    print(" where MAX_SIZE is an integer >= 0.")
+    print("")
+    print("If MAX_SIZE is 0, model an unbounded log message queue,")
+    print("otherwise model a queue holding up to MAX_SIZE messages.")
+    sys.exit(1)
+
+
+if not len(sys.argv) == 2:
+    usage()
+MAX_SIZE = int(sys.argv[1], base=10)
+if MAX_SIZE &lt; 0:
+    usage()
+
+message_queue = queue.Queue(maxsize=MAX_SIZE)
+
+
+class HLD(object):
+    def __del__(self):
+        message = u"%r destroyed %r\n" % (current_thread().name, self)
+        os.write(1, message.encode("utf-8"))
+        message_queue.put(message)
+
+    def __repr__(self):
+        return 'HLD(%r)' % (id(self),)
+
+
+def in_read_thread():
+    while True:
+        item = message_queue.get()
+        message = u"reader dequeued (%r)\n" % (item,)
+        os.write(1, message.encode("utf-8"))
+
+        # This block allocates cyclic garbage in order to
+        # make the gc sometimes activate on the read thread.
+        # For a faster repro, replace this block with:
+        #  import gc; gc.collect()
+        for _ in range(2):
+            trash = [object() for _ in range(100)]
+            trash.append(trash)
+            trash = None
+
+
+def in_write_thread():
+    while True:
+        # This block allocates cyclic garbage which has references to HLD
+        # objects. The HLD objects themselves aren't part of the cycles,
+        # so this cyclic garbage can be collected at some point.
+        trash = [HLD() for _ in range(10)]
+        trash.append(trash)
+        trash = None
+        time.sleep(0.1)
+        message_queue.put(u"Hello from write thread!")
+
+
+read_thread = Thread(target=in_read_thread)
+read_thread.name = "read_thread"
+read_thread.daemon = True
+read_thread.start()
+
+write_thread = Thread(target=in_write_thread)
+write_thread.name = "write_thread"
+write_thread.daemon = True
+write_thread.start()
+
+while True:
+    # Pause the main thread indefinitely (until the program is interrupted
+    # by pressing control-C at the terminal). Use time.sleep() for this
+    # rather than a lock or Thread.join(), because Python 2 has a bug
+    # wherein signals such as KeyboardInterrupt can't be delivered
+    # when the main thread is block on any kind of mutex.
+    # This bug appears to have been fixed in Python 3.
+    time.sleep(100)</pre
 >
 
 <p>

@@ -2,16 +2,21 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Continuous Julia-esque fractal</title>
     <style type="text/css">
+      html {
+        height: 100%;
+      }
       body {
         background: #ddd;
+        height: 100%;
       }
       main {
         box-sizing: border-box;
         padding: 10px;
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         overflow: hidden;
       }
       main > canvas {
@@ -24,7 +29,7 @@
         top: 25px;
         right: 25px;
         padding: 10px 20px;
-        opacity: 0.3;
+        opacity: 0.6;
       }
       #fractal-controls:hover {
         opacity: 1;
@@ -181,8 +186,6 @@ void main(void) {
           const ratio = window.devicePixelRatio || 1.0;
           canvas.width = Math.floor(box.width * ratio);
           canvas.height = Math.floor(box.height * ratio);
-          canvas.style.width = Math.floor(box.width) + "px";
-          canvas.style.height = Math.floor(box.height) + "px";
         }
 
         window.addEventListener("resize", handleResizeCanvas);
