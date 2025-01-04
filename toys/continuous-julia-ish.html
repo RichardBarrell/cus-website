@@ -42,8 +42,9 @@
   </head>
   <body>
     <main id="main">
-      <canvas id="gl"> Apparently there is no &lt;canvas&gt;. </canvas>
       <div id="fractal-controls">
+        <button type="button" id="start_rendering">(re)start</button>
+        <button type="button" id="stop_rendering">stop</button>
         <ul id="messages"></ul>
       </div>
     </main>
@@ -62,7 +63,16 @@
         messages.appendChild(li);
         t0 = t;
       }
-      const canvas = document.getElementById("gl");
+      let canvas = null;
+      function handleResizeCanvas() {
+        if (canvas == null) return;
+        const box = canvas.getBoundingClientRect();
+        const ratio = window.devicePixelRatio || 1.0;
+        canvas.width = Math.floor(box.width * ratio);
+        canvas.height = Math.floor(box.height * ratio);
+      }
+      window.addEventListener("resize", handleResizeCanvas);
+
       const controls = document.getElementById("fractal-controls");
       function toggleControlsVisibility(event) {
         if (controls.style.display === "none") {
@@ -79,8 +89,24 @@
         },
         false,
       );
+      document
+        .getElementById("start_rendering")
+        .addEventListener("click", startRendering, false);
+      document
+        .getElementById("stop_rendering")
+        .addEventListener("click", stopRendering, false);
+      let anim_timeout = null;
 
       function startRendering() {
+        if (canvas != null) {
+          canvas.parentElement.removeChild(canvas);
+        }
+        canvas = document.createElement("canvas");
+        canvas.setAttribute("alt", "A fractal");
+        main.appendChild(canvas);
+
+        handleResizeCanvas();
+        stopRendering();
         const gl = canvas.getContext("webgl", {
           failIfMajorPerformanceCaveat: true,
           antialias: false,
@@ -89,6 +115,7 @@
           stencil: false,
         });
         page_log("Created WebGL context");
+        window.gl = gl;
 
         const fill_tri = new Float32Array([0, 0, 0, 2, 2, 0]);
 
@@ -155,10 +182,13 @@ void main(void) {
         const coord2d_loc = gl.getAttribLocation(prog, "coord2d");
 
         const anim_t0 = Date.now();
-        let anim_timeout = null;
         let first_frame = true;
 
         function redisplay() {
+          if (gl.isContextLost()) {
+            page_log("WebGL context lost.");
+            return;
+          }
           var t = 1.0e-3 * (anim_t0 - Date.now());
           t0 = Date.now();
           gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -181,17 +211,14 @@ void main(void) {
           }
         }
 
-        function handleResizeCanvas() {
-          const box = canvas.getBoundingClientRect();
-          const ratio = window.devicePixelRatio || 1.0;
-          canvas.width = Math.floor(box.width * ratio);
-          canvas.height = Math.floor(box.height * ratio);
-        }
-
-        window.addEventListener("resize", handleResizeCanvas);
-
-        handleResizeCanvas();
         redisplay();
+      }
+
+      function stopRendering() {
+        if (anim_timeout != null) {
+          window.cancelAnimationFrame(anim_timeout);
+        }
+        anim_timeout = null;
       }
 
       startRendering();

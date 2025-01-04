@@ -2,17 +2,37 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <!-- <meta http-equiv="refresh" content="1" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Rotating Julia fractal</title>
     <style type="text/css">
-      body {
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAA9ElEQVQYGQ3BzS4DYRQG4HPe883o9CfxUZWxKbWw6YaFhbtyLS6Crb21jcQGSSPRJjQZqn9Gp2rMnKPPw+8QEV5+BvhpVvR+7GytnKdbVcWozm81x8zlVOOgtCgfvsbHAKx/qaFqoZX+dR7ACT9dXXzpWnobd5wTVrc7W0ZquvBnDYLI38Z5t2KqVsTdOgAdbZ4c9n6Jisl+JIAVEx91pyMlXTQcCLZK9njbP0/oO22LGfLBDko5Cl/mg4Mq2LD68KQWdR4ey6YjMqSZNzPycW/YErAhaQVkjLCT3E0dq7paMyAwEJ5mNZCZk5AZguxm3PZixv8pPXcdlcC16gAAAABJRU5ErkJggg==);
+      html {
+        height: 100%;
       }
-      #messages {
+      body {
+        background: #ddd;
+        height: 100%;
+      }
+      main {
+        box-sizing: border-box;
+        padding: 10px;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      main > canvas {
+        width: 100%;
+        height: 100%;
+      }
+      #fractal-controls {
         background: white;
-        float: right;
-        margin: 5px;
+        position: fixed;
+        top: 25px;
+        right: 25px;
         padding: 10px 20px;
+        opacity: 0.6;
+      }
+      #fractal-controls:hover {
+        opacity: 1;
       }
       body {
         margin: 0;
@@ -21,42 +41,85 @@
     </style>
   </head>
   <body>
-    <canvas id="gl"> Apparently there is no &lt;canvas&gt;. </canvas>
-
-    <ul id="messages"></ul>
+    <main id="main">
+      <div id="fractal-controls">
+        <button type="button" id="start_rendering">(re)start</button>
+        <button type="button" id="stop_rendering">stop</button>
+        <ul id="messages"></ul>
+      </div>
+    </main>
 
     <script type="text/javascript">
       // <!--
-      var messages = document.getElementById("messages");
-      var t0 = Date.now();
+      const messages = document.getElementById("messages");
+      const main = document.getElementById("main");
+      let t0 = Date.now();
       function page_log(message) {
-        var t = Date.now();
-        var li = document.createElement("li");
+        const t = Date.now();
+        const li = document.createElement("li");
         message = String(message);
         message = String(t - t0) + "ms " + message;
-        li.appendChild(document.createTextNode(String(message)));
+        li.textContent = message;
         messages.appendChild(li);
         t0 = t;
       }
-      page_log("click anywhere to resize fractal");
+      let canvas = null;
+      function handleResizeCanvas() {
+        if (canvas == null) return;
+        const box = canvas.getBoundingClientRect();
+        const ratio = window.devicePixelRatio || 1.0;
+        canvas.width = Math.floor(box.width * ratio);
+        canvas.height = Math.floor(box.height * ratio);
+      }
+      window.addEventListener("resize", handleResizeCanvas);
 
-      var canvas = document.getElementById("gl");
-      canvas.width = 480;
-      canvas.height = 360;
-      page_log(canvas);
+      const controls = document.getElementById("fractal-controls");
+      function toggleControlsVisibility(event) {
+        if (controls.style.display === "none") {
+          controls.style.display = "block";
+        } else {
+          controls.style.display = "none";
+        }
+      }
+      main.addEventListener("click", toggleControlsVisibility, false);
+      controls.addEventListener(
+        "click",
+        (event) => {
+          event.stopPropagation();
+        },
+        false,
+      );
+      document
+        .getElementById("start_rendering")
+        .addEventListener("click", startRendering, false);
+      document
+        .getElementById("stop_rendering")
+        .addEventListener("click", stopRendering, false);
+      let anim_timeout = null;
 
-      var gl = canvas.getContext("webgl", {
-        failIfMajorPerformanceCaveat: true,
-        antialias: false,
-        alpha: false,
-        depth: false,
-        stencil: false,
-      });
-      page_log(gl);
+      function startRendering() {
+        if (canvas != null) {
+          canvas.parentElement.removeChild(canvas);
+        }
+        canvas = document.createElement("canvas");
+        canvas.setAttribute("alt", "A fractal");
+        main.appendChild(canvas);
 
-      var fill_quad = new Float32Array([0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0]);
+        handleResizeCanvas();
+        stopRendering();
+        const gl = canvas.getContext("webgl", {
+          failIfMajorPerformanceCaveat: true,
+          antialias: false,
+          alpha: false,
+          depth: false,
+          stencil: false,
+        });
+        page_log("Created WebGL context");
+        window.gl = gl;
 
-      var v_shader_text = `
+        const fill_tri = new Float32Array([0, 0, 0, 2, 2, 0]);
+
+        const v_shader_text = `
 attribute vec2 coord2d;
 varying vec2 uv;
 void main(void) {
@@ -64,12 +127,13 @@ void main(void) {
  gl_Position = vec4(uv, 0.0, 1.0);
 }`;
 
-      var v_s = gl.createShader(gl.VERTEX_SHADER);
-      gl.shaderSource(v_s, v_shader_text);
-      gl.compileShader(v_s);
-      page_log("v: " + gl.getShaderInfoLog(v_s));
+        const v_s = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(v_s, v_shader_text);
+        gl.compileShader(v_s);
+        const v_log = gl.getShaderInfoLog(v_s);
+        if (v_log) page_log("vertex shader: " + v_log);
 
-      var f_shader_text = `
+        var f_shader_text = `
 precision mediump float;
 uniform vec2 c;
 varying vec2 uv;
@@ -96,52 +160,69 @@ void main(void) {
  gl_FragColor[3] = 1.0;
 }`;
 
-      var f_s = gl.createShader(gl.FRAGMENT_SHADER);
-      gl.shaderSource(f_s, f_shader_text);
-      gl.compileShader(f_s);
-      page_log("f: " + gl.getShaderInfoLog(f_s));
+        const f_s = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(f_s, f_shader_text);
+        gl.compileShader(f_s);
+        const f_log = gl.getShaderInfoLog(f_s);
+        if (f_log) page_log("fragment shader: " + f_log);
 
-      var prog = gl.createProgram();
-      gl.attachShader(prog, v_s);
-      gl.attachShader(prog, f_s);
-      gl.linkProgram(prog);
+        const prog = gl.createProgram();
+        gl.attachShader(prog, v_s);
+        gl.attachShader(prog, f_s);
+        gl.linkProgram(prog);
+        if (gl.getError()) {
+          page_log("Problem compiling shaders: " + gl.getProgramInfoLog(prog));
+          return;
+        }
 
-      page_log("p: " + gl.getProgramInfoLog(prog));
+        page_log("Compiled shaders");
 
-      page_log("compiled");
+        const vbo = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+        gl.bufferData(gl.ARRAY_BUFFER, fill_tri, gl.STATIC_DRAW);
+        const coord2d_loc = gl.getAttribLocation(prog, "coord2d");
 
-      var vbo = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-      gl.bufferData(gl.ARRAY_BUFFER, fill_quad, gl.STATIC_DRAW);
-      var coord2d_loc = gl.getAttribLocation(prog, "coord2d");
+        const anim_t0 = Date.now();
+        let first_frame = true;
 
-      var anim_t0 = Date.now();
-      function redisplay() {
-        var t = 1.0e-3 * (anim_t0 - Date.now());
-        t0 = Date.now();
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        gl.clearColor(0.5, 1.0, 1.0, 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.useProgram(prog);
-        gl.uniform2f(
-          gl.getUniformLocation(prog, "c"),
-          Math.sin(t),
-          Math.cos(t),
-        );
-        gl.enableVertexAttribArray(coord2d_loc);
-        gl.vertexAttribPointer(coord2d_loc, 2, gl.FLOAT, gl.FALSE, 0, 0);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-        gl.disableVertexAttribArray(coord2d_loc);
-        window.requestAnimationFrame(redisplay);
+        function redisplay() {
+          if (gl.isContextLost()) {
+            page_log("WebGL context lost.");
+            return;
+          }
+          var t = 1.0e-3 * (anim_t0 - Date.now());
+          t0 = Date.now();
+          gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+          gl.clearColor(0.5, 1.0, 1.0, 1.0);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.useProgram(prog);
+          gl.uniform2f(
+            gl.getUniformLocation(prog, "c"),
+            Math.sin(t),
+            Math.cos(t),
+          );
+          gl.enableVertexAttribArray(coord2d_loc);
+          gl.vertexAttribPointer(coord2d_loc, 2, gl.FLOAT, gl.FALSE, 0, 0);
+          gl.drawArrays(gl.TRIANGLES, 0, fill_tri.length / 2);
+          gl.disableVertexAttribArray(coord2d_loc);
+          anim_timeout = window.requestAnimationFrame(redisplay);
+          if (first_frame) {
+            page_log("Displayed first frame");
+            first_frame = false;
+          }
+        }
+
+        redisplay();
       }
 
-      redisplay();
-
-      function resizeCanvas(event) {
-        canvas.width = event.pageX;
-        canvas.height = event.pageY;
+      function stopRendering() {
+        if (anim_timeout != null) {
+          window.cancelAnimationFrame(anim_timeout);
+        }
+        anim_timeout = null;
       }
-      document.addEventListener("click", resizeCanvas, true);
+
+      startRendering();
       // -->
     </script>
   </body>
