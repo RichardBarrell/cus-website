@@ -2,125 +2,198 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Wibbly thing akin to a Mandelbröt</title>
     <style type="text/css">
-      body {
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAA9ElEQVQYGQ3BzS4DYRQG4HPe883o9CfxUZWxKbWw6YaFhbtyLS6Crb21jcQGSSPRJjQZqn9Gp2rMnKPPw+8QEV5+BvhpVvR+7GytnKdbVcWozm81x8zlVOOgtCgfvsbHAKx/qaFqoZX+dR7ACT9dXXzpWnobd5wTVrc7W0ZquvBnDYLI38Z5t2KqVsTdOgAdbZ4c9n6Jisl+JIAVEx91pyMlXTQcCLZK9njbP0/oO22LGfLBDko5Cl/mg4Mq2LD68KQWdR4ey6YjMqSZNzPycW/YErAhaQVkjLCT3E0dq7paMyAwEJ5mNZCZk5AZguxm3PZixv8pPXcdlcC16gAAAABJRU5ErkJggg==);
+      html {
+        height: 100%;
       }
-
-      #fractal-controls {
-        background: white;
-        float: right;
-        margin: 5px;
-        padding: 5px;
-      }
-
       body {
+        background: #ddd;
+        height: 100%;
         margin: 0;
         padding: 0;
       }
-
+      main {
+        box-sizing: border-box;
+        padding: 10px;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      main > canvas {
+        width: 100%;
+        height: 100%;
+      }
+      #fractal-controls {
+        background: white;
+        position: fixed;
+        top: 25px;
+        right: 25px;
+        padding: 10px 20px;
+        opacity: 0.6;
+      }
+      #fractal-controls:hover {
+        opacity: 1;
+      }
       .control label {
         display: inline-block;
         margin: 3px 5px;
       }
-
       .control input {
         float: right;
         margin: 0 5px;
       }
-
       .control button {
         display: block;
         margin: 1px 5px 3px auto;
       }
-
       .control {
         width: 100%;
         border: 1px solid pink;
         padding: 2px;
       }
-
       .control:after {
         content: "";
         clear: both;
       }
     </style>
   </head>
-
   <body>
-    <canvas id="gl"> Apparently there is no &lt;canvas&gt;. </canvas>
-
-    <div id="fractal-controls">
-      <div class="control">
-        <button id="change-canvas-size">Change size</button>
+    <main id="main">
+      <div id="fractal-controls">
+        <button type="button" id="start_rendering">(re)start</button>
+        <button type="button" id="stop_rendering">stop</button>
+        <div class="control">
+          <label for="fractal-wibbly">Wibbliness:</label>
+          <input
+            type="range"
+            id="fractal-wibbly"
+            min="0"
+            max="100"
+            value="30"
+          />
+        </div>
+        <div class="control">
+          <label for="fractal-boat">Boatometer:</label>
+          <input type="range" id="fractal-boat" min="0" max="100" value="0" />
+        </div>
+        <div class="control">
+          <label for="fractal-zoom">Zoom:</label>
+          <input
+            type="range"
+            id="fractal-zoom"
+            min="-1"
+            max="3"
+            value="1"
+            step="0.01"
+          />
+        </div>
+        <div class="control">
+          <label for="fractal-xoff">Horizontal offset:</label>
+          <input
+            type="range"
+            id="fractal-xoff"
+            min="-100"
+            max="100"
+            value="0"
+          />
+        </div>
+        <div class="control">
+          <label for="fractal-yoff">Vertical offset:</label>
+          <input
+            type="range"
+            id="fractal-yoff"
+            min="-100"
+            max="100"
+            value="0"
+          />
+        </div>
+        <div class="control">
+          <label for="fractal-speed">Speed:</label>
+          <input type="range" id="fractal-speed" min="1" max="100" value="50" />
+        </div>
+        <ul id="messages"></ul>
       </div>
-      <div class="control">
-        <button id="toggle-anim">Toggle animation</button>
-      </div>
-      <div class="control">
-        <label for="fractal-wibbly">Wibbliness:</label>
-        <input type="range" id="fractal-wibbly" min="0" max="100" value="30" />
-      </div>
-      <div class="control">
-        <label for="fractal-boat">Boatometer:</label>
-        <input type="range" id="fractal-boat" min="0" max="100" value="0" />
-      </div>
-      <div class="control">
-        <label for="fractal-zoom">Zoom:</label>
-        <input type="range" id="fractal-zoom" min="1" max="100" value="10" />
-      </div>
-      <div class="control">
-        <label for="fractal-xoff">Horizontal offset:</label>
-        <input type="range" id="fractal-xoff" min="-100" max="100" value="0" />
-      </div>
-      <div class="control">
-        <label for="fractal-yoff">Vertical offset:</label>
-        <input type="range" id="fractal-yoff" min="-100" max="100" value="0" />
-      </div>
-      <div class="control">
-        <label for="fractal-speed">Speed:</label>
-        <input type="range" id="fractal-speed" min="1" max="100" value="50" />
-      </div>
-      <div>
-        <p>Smooth avg=<span id="frame-avg">?</span>ms.</p>
-        <p>Smooth dev≅<span id="frame-dev">?</span>ms.</p>
-        <p>Instant time=<span id="frame-instant">?</span>ms.</p>
-      </div>
-      <ul id="messages"></ul>
-    </div>
+    </main>
 
     <script type="text/javascript">
       // <!--
-      var messages = document.getElementById("messages");
-      var t0 = Date.now();
+      const messages = document.getElementById("messages");
+      const main = document.getElementById("main");
+      let t0 = Date.now();
       function page_log(message) {
-        var t = Date.now();
-        var li = document.createElement("li");
+        const t = Date.now();
+        const li = document.createElement("li");
         message = String(message);
         message = String(t - t0) + "ms " + message;
-        li.appendChild(document.createTextNode(String(message)));
+        li.textContent = message;
         messages.appendChild(li);
         t0 = t;
       }
+      let canvas = null;
+      function handleResizeCanvas() {
+        if (canvas == null) return;
+        const box = canvas.getBoundingClientRect();
+        const ratio = window.devicePixelRatio || 1.0;
+        canvas.width = Math.floor(box.width * ratio);
+        canvas.height = Math.floor(box.height * ratio);
+      }
+      window.addEventListener("resize", handleResizeCanvas);
 
-      var canvas = document.getElementById("gl");
-      canvas.width = 480;
-      canvas.height = 360;
-      page_log(canvas);
+      const controls = document.getElementById("fractal-controls");
+      function toggleControlsVisibility(event) {
+        if (controls.style.display === "none") {
+          controls.style.display = "block";
+        } else {
+          controls.style.display = "none";
+        }
+      }
+      main.addEventListener("click", toggleControlsVisibility, false);
+      controls.addEventListener(
+        "click",
+        (event) => {
+          event.stopPropagation();
+        },
+        false,
+      );
+      document
+        .getElementById("start_rendering")
+        .addEventListener("click", startRendering, false);
+      document
+        .getElementById("stop_rendering")
+        .addEventListener("click", stopRendering, false);
+      let anim_timeout = null;
 
-      var gl = canvas.getContext("webgl", {
-        failIfMajorPerformanceCaveat: true,
-        antialias: false,
-        alpha: false,
-        depth: false,
-        stencil: false,
-      });
-      page_log(gl);
+      const input_wibbly = document.getElementById("fractal-wibbly");
+      const input_speed = document.getElementById("fractal-speed");
+      const input_zoom = document.getElementById("fractal-zoom");
+      const input_xoff = document.getElementById("fractal-xoff");
+      const input_yoff = document.getElementById("fractal-yoff");
+      const input_boat = document.getElementById("fractal-boat");
 
-      var fill_quad = new Float32Array([0, 0, 0, 2, 2, 0]);
+      function startRendering() {
+        if (canvas != null) {
+          canvas.parentElement.removeChild(canvas);
+        }
+        canvas = document.createElement("canvas");
+        canvas.setAttribute("alt", "A fractal");
+        main.appendChild(canvas);
 
-      var v_shader_text = `
+        handleResizeCanvas();
+        stopRendering();
+        const gl = canvas.getContext("webgl", {
+          failIfMajorPerformanceCaveat: true,
+          antialias: false,
+          alpha: false,
+          depth: false,
+          stencil: false,
+        });
+        page_log("Created WebGL context");
+
+        var fill_tri = new Float32Array([0, 0, 0, 2, 2, 0]);
+
+        var v_shader_text = `
 attribute vec2 coord2d;
 varying vec2 uv;
 uniform float time;
@@ -131,12 +204,13 @@ void main(void) {
  circle = vec2(sin(time), cos(time));
 }`;
 
-      var v_s = gl.createShader(gl.VERTEX_SHADER);
-      gl.shaderSource(v_s, v_shader_text);
-      gl.compileShader(v_s);
-      page_log("v: " + gl.getShaderInfoLog(v_s));
+        var v_s = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(v_s, v_shader_text);
+        gl.compileShader(v_s);
+        const v_log = gl.getShaderInfoLog(v_s);
+        if (v_log) page_log("vertex shader: " + v_log);
 
-      var f_shader_text = `
+        var f_shader_text = `
 precision mediump float;
 varying vec2 circle;
 varying vec2 uv;
@@ -172,145 +246,101 @@ void main(void) {
  gl_FragColor[3] = 1.0;
 }`;
 
-      var f_s = gl.createShader(gl.FRAGMENT_SHADER);
-      gl.shaderSource(f_s, f_shader_text);
-      gl.compileShader(f_s);
-      page_log("f: " + gl.getShaderInfoLog(f_s));
+        var f_s = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(f_s, f_shader_text);
+        gl.compileShader(f_s);
+        const f_log = gl.getShaderInfoLog(f_s);
+        if (f_log) page_log("fragment shader: " + f_log);
 
-      var prog = gl.createProgram();
-      gl.attachShader(prog, v_s);
-      gl.attachShader(prog, f_s);
-      gl.linkProgram(prog);
+        var prog = gl.createProgram();
+        gl.attachShader(prog, v_s);
+        gl.attachShader(prog, f_s);
+        gl.linkProgram(prog);
+        if (gl.getError()) {
+          page_log("Problem compiling shaders: " + gl.getProgramInfoLog(prog));
+          return;
+        }
 
-      page_log("p: " + gl.getProgramInfoLog(prog));
+        page_log("Compiled shaders");
 
-      page_log("compiled");
+        var vbo = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+        gl.bufferData(gl.ARRAY_BUFFER, fill_tri, gl.STATIC_DRAW);
+        var coord2d_loc = gl.getAttribLocation(prog, "coord2d");
 
-      var vbo = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-      gl.bufferData(gl.ARRAY_BUFFER, fill_quad, gl.STATIC_DRAW);
-      var coord2d_loc = gl.getAttribLocation(prog, "coord2d");
+        let anim_t0 = Date.now();
+        let first_frame = true;
 
-      var anim_t0 = Date.now();
-      var animated = true;
-      var anim_timeout = null;
-
-      var input_wibbly = document.getElementById("fractal-wibbly");
-      var input_speed = document.getElementById("fractal-speed");
-      var input_zoom = document.getElementById("fractal-zoom");
-      var input_xoff = document.getElementById("fractal-xoff");
-      var input_yoff = document.getElementById("fractal-yoff");
-      var input_boat = document.getElementById("fractal-boat");
-
-      input_speed.addEventListener(
-        "change",
-        function () {
-          anim_t0 = Date.now();
-        },
-        false,
-      );
-      input_speed.addEventListener(
-        "input",
-        function () {
-          anim_t0 = Date.now();
-        },
-        false,
-      );
-
-      function redisplay() {
-        var draw_start = performance.now();
-        var t =
-          1.0e-3 *
-          (anim_t0 - Date.now()) *
-          (parseFloat(input_speed.value) / 50.0);
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        gl.clearColor(0.5, 1.0, 1.0, 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.useProgram(prog);
-        gl.uniform1f(gl.getUniformLocation(prog, "time"), t);
-        gl.uniform1f(
-          gl.getUniformLocation(prog, "wibbly"),
-          parseFloat(input_wibbly.value),
+        input_speed.addEventListener(
+          "change",
+          function () {
+            anim_t0 = Date.now();
+          },
+          false,
         );
-        gl.uniform1f(
-          gl.getUniformLocation(prog, "zoom"),
-          parseFloat(input_zoom.value),
+        input_speed.addEventListener(
+          "input",
+          function () {
+            anim_t0 = Date.now();
+          },
+          false,
         );
-        gl.uniform1f(
-          gl.getUniformLocation(prog, "xoff"),
-          parseFloat(input_xoff.value),
-        );
-        gl.uniform1f(
-          gl.getUniformLocation(prog, "yoff"),
-          parseFloat(input_yoff.value),
-        );
-        gl.uniform1f(
-          gl.getUniformLocation(prog, "boat"),
-          parseFloat(input_boat.value) / 100.0,
-        );
-        gl.enableVertexAttribArray(coord2d_loc);
-        gl.vertexAttribPointer(coord2d_loc, 2, gl.FLOAT, gl.FALSE, 0, 0);
-        gl.drawArrays(gl.TRIANGLES, 0, fill_quad.length / 2);
-        gl.disableVertexAttribArray(coord2d_loc);
-        if (animated) {
+
+        function redisplay() {
+          if (gl.isContextLost()) {
+            page_log("WebGL context lost.");
+            return;
+          }
+          var t =
+            1.0e-3 *
+            (anim_t0 - Date.now()) *
+            (parseFloat(input_speed.value) / 50.0);
+          gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+          gl.clearColor(0.5, 1.0, 1.0, 1.0);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.useProgram(prog);
+          gl.uniform1f(gl.getUniformLocation(prog, "time"), t);
+          gl.uniform1f(
+            gl.getUniformLocation(prog, "wibbly"),
+            parseFloat(input_wibbly.value),
+          );
+          gl.uniform1f(
+            gl.getUniformLocation(prog, "zoom"),
+            Math.pow(10, parseFloat(input_zoom.value)),
+          );
+          gl.uniform1f(
+            gl.getUniformLocation(prog, "xoff"),
+            parseFloat(input_xoff.value),
+          );
+          gl.uniform1f(
+            gl.getUniformLocation(prog, "yoff"),
+            parseFloat(input_yoff.value),
+          );
+          gl.uniform1f(
+            gl.getUniformLocation(prog, "boat"),
+            parseFloat(input_boat.value) / 100.0,
+          );
+          gl.enableVertexAttribArray(coord2d_loc);
+          gl.vertexAttribPointer(coord2d_loc, 2, gl.FLOAT, gl.FALSE, 0, 0);
+          gl.drawArrays(gl.TRIANGLES, 0, fill_tri.length / 2);
+          gl.disableVertexAttribArray(coord2d_loc);
           anim_timeout = window.requestAnimationFrame(redisplay);
+          if (first_frame) {
+            page_log("Displayed first frame");
+            first_frame = false;
+          }
         }
-        var draw_end = performance.now();
-        var draw_time = draw_end - draw_start;
-        update_frame_time_counter(draw_time);
+        redisplay();
       }
 
-      var moving_avg = 0.0;
-      var moving_dev = 0.0;
-      var avg_span = document.getElementById("frame-avg");
-      var dev_span = document.getElementById("frame-dev");
-      var instant_span = document.getElementById("frame-instant");
-      function update_frame_time_counter(draw_time) {
-        moving_avg = moving_avg * 0.98 + draw_time * 0.02;
-        moving_dev =
-          moving_dev * 0.98 + Math.abs(moving_avg - draw_time) * 0.02;
-        avg_span.textContent = moving_avg.toFixed(2);
-        dev_span.textContent = moving_dev.toFixed(2);
-        instant_span.textContent = draw_time.toFixed(2);
-      }
-
-      redisplay();
-
-      var toggle_anim_button = document.getElementById("toggle-anim");
-      var change_canvas_size_button =
-        document.getElementById("change-canvas-size");
-      function changeCanvasSize(event) {
-        change_canvas_size_button.textContent =
-          "Now click anywhere to resize canvas";
-        document.addEventListener("click", resizeCanvas, true);
-      }
-      function resizeCanvas(event) {
-        event.preventDefault();
-        canvas.width = event.pageX;
-        canvas.height = event.pageY;
-        change_canvas_size_button.textContent = "Change size";
-        if (!animated) {
-          redisplay();
-        }
-        document.removeEventListener("click", resizeCanvas, true);
-      }
-      function toggleAnim(event) {
-        if (anim_timeout) {
+      function stopRendering() {
+        if (anim_timeout != null) {
           window.cancelAnimationFrame(anim_timeout);
-          anim_timeout = null;
         }
-        animated = !animated;
-        if (animated) {
-          redisplay();
-        }
+        anim_timeout = null;
       }
 
-      toggle_anim_button.addEventListener("click", toggleAnim, false);
-      change_canvas_size_button.addEventListener(
-        "click",
-        changeCanvasSize,
-        false,
-      );
+      startRendering();
       // -->
     </script>
   </body>

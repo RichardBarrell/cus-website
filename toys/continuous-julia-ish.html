@@ -11,6 +11,8 @@
       body {
         background: #ddd;
         height: 100%;
+        margin: 0;
+        padding: 0;
       }
       main {
         box-sizing: border-box;
@@ -33,10 +35,6 @@
       }
       #fractal-controls:hover {
         opacity: 1;
-      }
-      body {
-        margin: 0;
-        padding: 0;
       }
     </style>
   </head>
@@ -115,7 +113,6 @@
           stencil: false,
         });
         page_log("Created WebGL context");
-        window.gl = gl;
 
         const fill_tri = new Float32Array([0, 0, 0, 2, 2, 0]);
 
