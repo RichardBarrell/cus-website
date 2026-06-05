@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Connection pools must propagate connection errors</title>
+    <link rel="stylesheet" href="normalize-5.0.css" />
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body>
+    <div id="content">
+      
+      <h1>Connection pools must propagate connection errors</h1>
+      <nav class="top-nav">
+        <a href="/">Home</a>
+        <a href="/cv.html">C.V.</a>
+        <a href="/blog_list.html">Blog posts</a>
+        <a href="mailto:richard@brrll.co.uk">Contact</a>
+      </nav>
+
+      
+    <nav class="under-nav">
+      <a href="blog-2017-08-19-customer-service-101.html">
+        Previous post: Customer support 101 for SMEs that sell software</a
+      
+      >
+      
+    </nav>
+
+    <ul>
+  <li>
+    If you are writing a connection pool and someone calls pool.getConnection()
+    for the first time, your connection pool will at some point need to
+    internally call some internal method like "this._createConnection()".
+  </li>
+  <li>
+    If the internal _createConnection() method throws an error, you need to make
+    sure that that specific error gets plumbed up to the caller of the public
+    pool.getConnection() method. Error chaining is usually ideal.
+  </li>
+  <li>
+    You still need to make sure this happens even if _createConnection() was
+    called internally *before* pool.getConnection() was ever called, which is a
+    common situation if your pool eagerly opens connections on start.
+  </li>
+  <li>
+    If you do not do this AND you don't log connection errors anywhere THEN all
+    connection error information gets discarded and hence all connection issues
+    will show up as something completely uselessly nonspecific like "pool
+    timeout: failed to retrieve a connection from pool after 10000ms",
+  </li>
+  <li>instead of what the actual problem is,</li>
+  <li>and now I'm debugging in the dark.</li>
+</ul>
+
+<p>
+  (In practice it'll usually be fine if you attach any recent error from any
+  relevant _createConnection() call. It doesn't really have to be a specific
+  one: most of the time when connection settings are misconfigured it'll result
+  in every connection attempt having a more-or-less identical error anyway.)
+</p>
+
+<p>
+  It's very upsetting to have to patch your dependencies to add missing error
+  logging in the middle of an outage.
+</p>
+
+  
+
+      <div style="clear: both"></div>
+      <p id="copyright">
+        © Copyright 2026 Richard
+        Barrell
+      </p>
+    </div>
+  </body>
+</html>
+

@@ -229,7 +229,7 @@
         if (event.deltaMode === event.DOM_DELTA_LINE) deltaY /= 10.0;
         if (![event.DOM_DELTA_LINE, event.DOM_DELTA_PIXEL].includes(event.deltaMode))
           return;
-        input_zoom.value = parseFloat(input_zoom.value) - deltaY * 5e-4;
+        input_zoom.value = parseFloat(input_zoom.value) + deltaY * 5e-4;
         setZoom();
       }
 
