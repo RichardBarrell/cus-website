@@ -29,19 +29,22 @@
 
     <ul>
   <li>
-    If you are writing a connection pool and someone calls pool.getConnection()
-    for the first time, your connection pool will at some point need to
-    internally call some internal method like "this._createConnection()".
+    If you are writing a connection pool and someone calls
+    <code>pool.getConnection()</code> for the first time, your connection pool
+    will at some point need to internally call some internal method like
+    <code>this._createConnection()</code>.
   </li>
   <li>
-    If the internal _createConnection() method throws an error, you need to make
-    sure that that specific error gets plumbed up to the caller of the public
-    pool.getConnection() method. Error chaining is usually ideal.
+    If the internal <code>_createConnection()</code> method throws an error, you
+    need to make sure that that specific error gets plumbed up to the caller of
+    the public <code>pool.getConnection()</code> method. Error chaining is
+    usually ideal.
   </li>
   <li>
-    You still need to make sure this happens even if _createConnection() was
-    called internally *before* pool.getConnection() was ever called, which is a
-    common situation if your pool eagerly opens connections on start.
+    You still need to make sure this happens even if
+    <code>_createConnection()</code> was called internally *before*
+    <code>pool.getConnection()</code> was ever called, which is a common
+    situation if your pool eagerly opens connections on start.
   </li>
   <li>
     If you do not do this AND you don't log connection errors anywhere THEN all
