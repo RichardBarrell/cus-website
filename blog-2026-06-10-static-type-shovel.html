@@ -28,46 +28,56 @@
     </nav>
 
     <p>
-  I have a simple theory (okay, a postulate) about why static typing became much
-  less popular in the 2000s to early 2010s and started to get more popular again
-  around the mid to late 2010s. It isn't because programming is a fashion led
-  industry, but because the quality of the static type systems that were widely
-  available improved.
+  I have a simple theory about why static typing became much less popular in the
+  2000s to early 2010s and started to get more popular again around the mid to
+  late 2010s. It isn't because programming is a fashion led industry, but
+  because the quality of the static type systems that were widely available
+  improved.
 </p>
 
 <p>
-  Here's an analogy for you: imagine you want to dig a hole. Would you rather
-  use a shovel or your hands? If the shovel is any good then obviously you'd
-  rather use the shovel. But what if for some reason the only shovel available
-  to you was made of paper? That wouldn't lift any dirt and you'd just be
-  flailing uselessly at the ground with it. If the only shovel you had was made
-  of paper, you'd be better off digging barehanded.
+  Here's an analogy: say you want to dig a hole, would you rather use a shovel
+  or your hands? If the shovel is any good then obviously you'd use the shovel.
+  But what if the only shovel available to you was made of paper? You'd just be
+  flailing uselessly at the ground with it. You'd be better off digging
+  barehanded.
 </p>
 
 <p>
-  In a system with no static type system, you have to do all of the thinking
-  about the states and contents of the variables and fields in your program
-  yourself, with your own brain, and the computer doesn't help you at all. It's
-  analogous to digging with your hands.
+  With a dynamic type system, you have to do all of the thinking about the
+  states and contents of the variables and fields in your program yourself, with
+  your own brain. The computer doesn't help you at all, nor does it hinder you.
+  It's analogous to digging with your hands.
 </p>
 
 <p>
-  This isn't the worst thing, of course. Small children have been known to
-  successfully dig enormous holes on beaches with nothing but their hands. I
-  should know, I was one of them.
+  On the other hand, if you're given a poor static type system like the ones
+  that were popular in the 90s and early 00s, such as the ones in early Java or
+  C++98, it's analogous to a paper shovel. These static type systems fail to
+  even help you with simple things like distinguishing nullable from
+  non-nullable pointers. They don't have sum types, only product types.
+  Meanwhile they require you to spend a lot of effort manually writing out type
+  names all over the place.
+  <code
+    >BufferedReader bufferedReader = new BufferedReader(new
+    FileReader(filename));</code
+  >
+  is a small disaster.
 </p>
 
 <p>
-  On the other hand, if you're given a static type system like the ones that
-  were popular in the 90s and early 00s, such as the ones in early Java or
-  C++98, it's analogous to being handed a shovel made out of paper. These static
-  type systems impose large costs and they fail to even help you with simple
-  things. They don't distinguish nullable from non-nullable pointers. They don't
-  have sum types (also known as tagged unions or discriminated unions), only
-  product types (like structs). Meanwhile they require you to expend a lot of
-  effort manually writing out type names all over the place. It is a waste of
-  brains and effort to write out things like
-  <code>BufferedReader bf = new BufferedReader(new FileReader("input.txt"));</code>
+  On the other hand, if you're given a poor static type system like the ones
+  that were popular in the 90s and early 00s, like early Java or C++98, it's
+  analogous to being handed a shovel made out of paper. These static type
+  systems impose large costs and they fail to even help you with simple things.
+  They don't distinguish nullable from non-nullable pointers. They don't have
+  sum types (also known as tagged unions or discriminated unions), only product
+  types (like structs). Meanwhile they require you to expend a lot of effort
+  manually writing out type names all over the place. It is a waste of brains
+  and effort to write out things like
+  <code
+    >BufferedReader bf = new BufferedReader(new FileReader("input.txt"));</code
+  >
   when a nice type system would just infer most variable types for you.
 </p>
 
@@ -81,11 +91,10 @@
     <code>Maybe t</code>. TypeScript has <code>T | null</code>. Swift has
     <code>T?</code>. Rust has <code>Optional&lt;T&gt;</code>. The type system
     can easily tell you where all the null checks need to be and if you missed
-    one. In practice this means that you almost have to debug null pointer
-    errors at runtime.
+    one. In practice you almost never see null pointer errors at runtime.
   </li>
   <li>
-    At least one of: sum types or union types, which let you follow the
+    At least one of sum types or union types, which let you follow the
     <a href="https://blog.janestreet.com/effective-ml-revisited/">
       "Make invalid states unrepresentable"
     </a>
@@ -94,20 +103,19 @@
     in a relevant state.
   </li>
   <li>
-    Some degree of type inference. We don't need to write
+    Some kind of type inference. We don't need to write
     <code>let x: number = 5;</code> when the compiler can just work out that
     <code>let x = 5;</code> is definitely a number.
   </li>
 </ul>
 
 <p>
-  One more big factor which has made static type systems more useful over time
-  is that IDE features which offer suggestions based on static type information
-  have become more widely available. In the 90s, Intellisense was a killer
-  feature in Visual Studio, whereas in the 2020s similar features are available
-  in just about every IDE and editor. This means the information you put into a
-  static type system yields extra productivity benefits entirely aside from its
-  usefulness for checking programs for errors.
+  Another thing which made static type systems more useful is that IDE features
+  like method name completion have become more widespread. In the 90s
+  Intellisense was a killer feature in Visual Studio, whereas in the 2020s
+  similar features are available in just about every IDE and editor. So
+  information you put into a static type system yields extra productivity
+  benefits, entirely aside from its usefulness for checking programs for errors.
 </p>
 
 <p>In conclusion:</p>
