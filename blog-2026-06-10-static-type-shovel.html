@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Static types and shovels</title>
+    <link rel="stylesheet" href="normalize-5.0.css" />
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body>
+    <div id="content">
+      
+      <h1>Static types and shovels</h1>
+      <nav class="top-nav">
+        <a href="/">Home</a>
+        <a href="/cv.html">C.V.</a>
+        <a href="/blog_list.html">Blog posts</a>
+        <a href="mailto:richard@brrll.co.uk">Contact</a>
+      </nav>
+
+      
+    <nav class="under-nav">
+      <a href="blog-2026-06-05-connectionpools.html">
+        Previous post: Connection pools must propagate connection errors</a
+      
+      >
+      
+    </nav>
+
+    <p>
+  I have a simple theory (okay, a postulate) about why static typing became much
+  less popular in the 2000s to early 2010s and started to get more popular again
+  around the mid to late 2010s. It isn't because programming is a fashion led
+  industry, but because the quality of the static type systems that were widely
+  available improved.
+</p>
+
+<p>
+  Here's an analogy for you: imagine you want to dig a hole. Would you rather
+  use a shovel or your hands? If the shovel is any good then obviously you'd
+  rather use the shovel. But what if for some reason the only shovel available
+  to you was made of paper? That wouldn't lift any dirt and you'd just be
+  flailing uselessly at the ground with it. If the only shovel you had was made
+  of paper, you'd be better off digging barehanded.
+</p>
+
+<p>
+  In a system with no static type system, you have to do all of the thinking
+  about the states and contents of the variables and fields in your program
+  yourself, with your own brain, and the computer doesn't help you at all. It's
+  analogous to digging with your hands.
+</p>
+
+<p>
+  This isn't the worst thing, of course. Small children have been known to
+  successfully dig enormous holes on beaches with nothing but their hands. I
+  should know, I was one of them.
+</p>
+
+<p>
+  On the other hand, if you're given a static type system like the ones that
+  were popular in the 90s and early 00s, such as the ones in early Java or
+  C++98, it's analogous to being handed a shovel made out of paper. These static
+  type systems impose large costs and they fail to even help you with simple
+  things. They don't distinguish nullable from non-nullable pointers. They don't
+  have sum types (also known as tagged unions or discriminated unions), only
+  product types (like structs). Meanwhile they require you to expend a lot of
+  effort manually writing out type names all over the place. It is a waste of
+  brains and effort to write out things like
+  <code>BufferedReader bf = new BufferedReader(new FileReader("input.txt"));</code>
+  when a nice type system would just infer most variable types for you.
+</p>
+
+<p>
+  If you contrast this to a modern type system like the one in say TypeScript,
+  Haskell, MyPy, Swift or Rust, you'll always get:
+</p>
+<ul>
+  <li>
+    Some way of distinguishing nullable from non-nullable types. Haskell has
+    <code>Maybe t</code>. TypeScript has <code>T | null</code>. Swift has
+    <code>T?</code>. Rust has <code>Optional&lt;T&gt;</code>. The type system
+    can easily tell you where all the null checks need to be and if you missed
+    one. In practice this means that you almost have to debug null pointer
+    errors at runtime.
+  </li>
+  <li>
+    At least one of: sum types or union types, which let you follow the
+    <a href="https://blog.janestreet.com/effective-ml-revisited/">
+      "Make invalid states unrepresentable"
+    </a>
+    practice. This means you can have objects representing state machines, they
+    have multiple fields, and each field exists when and only when the system is
+    in a relevant state.
+  </li>
+  <li>
+    Some degree of type inference. We don't need to write
+    <code>let x: number = 5;</code> when the compiler can just work out that
+    <code>let x = 5;</code> is definitely a number.
+  </li>
+</ul>
+
+<p>
+  One more big factor which has made static type systems more useful over time
+  is that IDE features which offer suggestions based on static type information
+  have become more widely available. In the 90s, Intellisense was a killer
+  feature in Visual Studio, whereas in the 2020s similar features are available
+  in just about every IDE and editor. This means the information you put into a
+  static type system yields extra productivity benefits entirely aside from its
+  usefulness for checking programs for errors.
+</p>
+
+<p>In conclusion:</p>
+<ul>
+  <li>A good dynamic type system is better than a bad static type system.</li>
+  <li>But now we have much better static type systems than we used to.</li>
+</ul>
+
+  
+
+      <div style="clear: both"></div>
+      <p id="copyright">
+        © Copyright 2026 Richard
+        Barrell
+      </p>
+    </div>
+  </body>
+</html>
+
