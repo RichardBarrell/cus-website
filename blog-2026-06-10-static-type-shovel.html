@@ -66,22 +66,6 @@
 </p>
 
 <p>
-  On the other hand, if you're given a poor static type system like the ones
-  that were popular in the 90s and early 00s, like early Java or C++98, it's
-  analogous to being handed a shovel made out of paper. These static type
-  systems impose large costs and they fail to even help you with simple things.
-  They don't distinguish nullable from non-nullable pointers. They don't have
-  sum types (also known as tagged unions or discriminated unions), only product
-  types (like structs). Meanwhile they require you to expend a lot of effort
-  manually writing out type names all over the place. It is a waste of brains
-  and effort to write out things like
-  <code
-    >BufferedReader bf = new BufferedReader(new FileReader("input.txt"));</code
-  >
-  when a nice type system would just infer most variable types for you.
-</p>
-
-<p>
   If you contrast this to a modern type system like the one in say TypeScript,
   Haskell, MyPy, Swift or Rust, you'll always get:
 </p>
