@@ -1,4 +1,5 @@
-<rss version="2.0">
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Richard Barrell's blog</title>
     <link>https://carefully.understood.systems</link>
@@ -7,7 +8,7 @@
     <language>en-gb</language>
     <copyright>© Copyright 2017-2026 Richard Barrell</copyright>
     <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
-    <lastBuildDate>Thu, 18 Jun 2026 09:44:25 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 18 Jun 2026 09:54:18 +0000</lastBuildDate>
     <ttl>60</ttl>
     <item>
       <title>Static types and shovels</title>
