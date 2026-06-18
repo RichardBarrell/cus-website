@@ -6,7 +6,7 @@
     <language>en-gb</language>
     <copyright>© Copyright 2017-2026 Richard Barrell</copyright>
     <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
-    <lastBuildDate>Thu, 18 Jun 2026 09:34:49 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 18 Jun 2026 09:37:21 +0000</lastBuildDate>
     <ttl>60</ttl>
     <item>
       <title>Static types and shovels</title>
@@ -16,7 +16,7 @@
     <item>
       <title>Connection pools must propagate connection errors</title>
       <link>https://carefully.understood.systems/blog-2026-06-05-connectionpools.html</link>
-      <description>(In practice it'll usually be fine if you attach any recent error from any relevant _createConnection() call. It doesn't really have to be a specific one: most of the time when connection settings are misconfigured it'll result in every connection attempt having a more-or-less identical error anyway.)</description>
+      <description>It's really common and unfortunate to see connection pool classes that hide errors and make debugging connection problems much harder.</description>
     </item>
     <item>
       <title>Customer support 101 for SMEs that sell software</title>
