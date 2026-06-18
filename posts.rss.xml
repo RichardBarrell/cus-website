@@ -2,46 +2,61 @@
   <channel>
     <title>Richard Barrell's blog</title>
     <link>https://carefully.understood.systems</link>
+    <atom:link href="https://carefully.understood.systems/posts.rss.xml" rel="self" type="application/rss+xml"/>
     <description>Richard Barrell's blog</description>
     <language>en-gb</language>
     <copyright>© Copyright 2017-2026 Richard Barrell</copyright>
     <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
-    <lastBuildDate>Thu, 18 Jun 2026 09:37:21 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 18 Jun 2026 09:44:25 +0000</lastBuildDate>
     <ttl>60</ttl>
     <item>
       <title>Static types and shovels</title>
       <link>https://carefully.understood.systems/blog-2026-06-10-static-type-shovel.html</link>
       <description>I have a simple theory about why static typing became much less popular in the 2000s to early 2010s and started to get more popular again around the mid to late 2010s. It isn't because programming is a fashion led industry, but because the quality of the static type systems that were widely available improved.</description>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>blog-2026-06-10-static-type-shovel.html</guid>
     </item>
     <item>
       <title>Connection pools must propagate connection errors</title>
       <link>https://carefully.understood.systems/blog-2026-06-05-connectionpools.html</link>
       <description>It's really common and unfortunate to see connection pool classes that hide errors and make debugging connection problems much harder.</description>
+      <pubDate>Fri, 05 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>blog-2026-06-05-connectionpools.html</guid>
     </item>
     <item>
       <title>Customer support 101 for SMEs that sell software</title>
       <link>https://carefully.understood.systems/blog-2017-08-19-customer-service-101.html</link>
       <description>Let's say, hypothetically, you're running a small company, you sell software on a B2B basis, and you're just starting to really grow the number of customers you have, and they have questions for you.</description>
+      <pubDate>Sat, 19 Aug 2017 00:00:00 +0000</pubDate>
+      <guid>blog-2017-08-19-customer-service-101.html</guid>
     </item>
     <item>
       <title>Logging messages onto a strictly bounded queue is perilous</title>
       <link>https://carefully.understood.systems/blog-2017-04-19-bounded-log-queue.html</link>
       <description>Imagine we have a complicated program with a logging framework in it which puts messages on a queue. One thread is responsible for taking log messages from the queue and writing them somewhere, such as a logstash instance or local database.</description>
+      <pubDate>Wed, 19 Apr 2017 00:00:00 +0000</pubDate>
+      <guid>blog-2017-04-19-bounded-log-queue.html</guid>
     </item>
     <item>
       <title>Recording game videos with ShadowPlay and ffmpeg</title>
       <link>https://carefully.understood.systems/blog-2017-04-17-ffmpeg-vod.html</link>
       <description>Occasionally, I want to record myself playing a videogame. I use Nvidia's ShadowPlay for this, which sorta got renamed to “GeForce Experience” a while back. I don't currently attempt to stream video because the internet connection I have right now doesn't have enough upstream bandwidth.</description>
+      <pubDate>Mon, 17 Apr 2017 00:00:00 +0000</pubDate>
+      <guid>blog-2017-04-17-ffmpeg-vod.html</guid>
     </item>
     <item>
       <title>Zero-copy? How about three?</title>
       <link>https://carefully.understood.systems/blog-2017-03-24-three-copies.html</link>
       <description>I accuse that, in most web applications, we're probably going to end up copying the data that we produce about three times. Herein, by “copy”, I mean “read every byte of response data and then write it all back out again”.</description>
+      <pubDate>Fri, 24 Mar 2017 00:00:00 +0000</pubDate>
+      <guid>blog-2017-03-24-three-copies.html</guid>
     </item>
     <item>
       <title>Four dumb questions I'd like to ask hardware designers</title>
       <link>https://carefully.understood.systems/blog-2017-03-23-questions.html</link>
       <description>Given that an x86 doesn't touch memory in anything less than 64-byte increments (since that's the cache line size), and that the slow part of a lock cmpxchg8/16b instruction is acquiring exclusive use of the relevant cache line rather than comparing the contents of the source and targets, how come there isn't a lock cmpxchg64b instruction, just to make lock-free algorithms easier?</description>
+      <pubDate>Thu, 23 Mar 2017 00:00:00 +0000</pubDate>
+      <guid>blog-2017-03-23-questions.html</guid>
     </item>
   </channel>
 </rss>
