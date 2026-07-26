@@ -6,7 +6,12 @@
     <title>Logging messages onto a strictly bounded queue is perilous</title>
     <link rel="stylesheet" href="normalize-5.0.css" />
     <link rel="stylesheet" href="main.css" />
-   <link rel="alternate" type="application/rss+xml" href="posts.rss.xml" title="Richard Barrell's blog" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      href="posts.rss.xml"
+      title="Richard Barrell's blog"
+    />
   </head>
   <body>
     <div id="content">
@@ -14,7 +19,6 @@
       <h1>Logging messages onto a strictly bounded queue is perilous</h1>
       <nav class="top-nav">
         <a href="/">Home</a>
-        <a href="/cv.html">C.V.</a>
         <a href="/blog_list.html">Blog posts</a>
         <a href="mailto:richard@brrll.co.uk">Contact</a>
       </nav>
@@ -143,8 +147,7 @@ while True:
     # wherein signals such as KeyboardInterrupt can't be delivered
     # when the main thread is block on any kind of mutex.
     # This bug appears to have been fixed in Python 3.
-    time.sleep(100)</pre
->
+    time.sleep(100)</pre>
 
 <p>
   If you run this program with the argument 0, it will simulate a system with an
@@ -206,8 +209,7 @@ reader dequeued (u"'write_thread' destroyed HLD(140364268957904)\n")
 'write_thread' destroyed HLD(140364268958864)
 reader dequeued (u"'write_thread' destroyed HLD(140364268959120)\n")
 'write_thread' destroyed HLD(140364268958800)
-reader dequeued (u"'write_thread' destroyed HLD(140364268959056)\n")</pre
->
+reader dequeued (u"'write_thread' destroyed HLD(140364268959056)\n")</pre>
 
 <p>
   If the garbage collector kicks in on the <code>read_thread</code> instead,
@@ -233,8 +235,7 @@ reader dequeued (u'Hello from write thread!')
 'read_thread' destroyed HLD(140364269227408)
 'read_thread' destroyed HLD(140364269227344)
 'read_thread' destroyed HLD(140364269227280)
-'read_thread' destroyed HLD(140364269227216)</pre
->
+'read_thread' destroyed HLD(140364269227216)</pre>
 
 <p>And there it freezes, deadlocked.</p>
 
